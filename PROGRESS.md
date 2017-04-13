@@ -19,3 +19,5 @@ provide a list of 3 alternatives.
 1. Create a model of what the bar man knows and doesn't know
 2. Make conversation in order to find out if this is correct
 3. Model: drinks -> Use web to find out what cocktails are available (ingredients, procedures, connection with preferences of customers)
+
+Find literature that explains how to build a conversation and a narrative, as well as how to connect them to a knowledge system. 
