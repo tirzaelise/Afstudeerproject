@@ -30,8 +30,6 @@ Interesting papers:
     Gives several computational models, which provide a model to understand cognitive phenomena related to symbol emergence.     Such as multimodal categorisation,  which  is  used  to  reproduce  the  process  of  forming  categories and concepts       based on experience, and spatial concept formation, which organises the robot’s memory to integrate information about         places, names, objects, and tasks related to  the place.  Driving behaviour  datawas used to perform double articulation     analysis (a stream of speech can be  divided  into  meaningful  signs,  which  can  be  further  subdivided  into             meaningless elements), which showed that a driving word and a driving letter represent the segments in driving behavior       data, corresponding to a  word  and  phoneme  in  speech  signals.   Also  gives  several  methods  for language             acquisition.
 
     Link to own project:  Multimodal categorisation is a method to form categories and concepts based on experience, which       could be used to create and update the knowledge base of the robot.  Spatial concept formation organises the robot’s         memory to integrate information about places, names, objects, and tasks related to a place, which could be used to create     the link between a customer, their drink order and their position.
-
-    Key words:  symbol emergence, human-machine communication, symbol system hypothesis, multimodal learning, spatial concept     formation, double articulation analysis, language acquisition
     
 ### Thursday 20/04/2017
 
@@ -56,16 +54,18 @@ Interesting papers:
 
     Link to own project: A similar method could be used to ask clarifying questions to the barman and to be able to               understand his responses.
     
-    Key  words:   natural  language  understanding, reinforcement  learning, partially observable markov decision process         (POMDP), q-learning, kalman temporal differences, dialog system, semantic parser learning, dialog strategy learning
-    
 3.  Summary of Artificial Cognition for Social Human-Robot Interaction: An Implementation [Lemaignan  et  al.,  2016]:           Characterises  the  challenges  of human-robot interaction in artificial intelligence and exhibits a set of key               decisional issues that need to be addressed for a cognitive robot to successfully share space and tasks with a human.         Natural language grounding is done using the Google speech recognition API for speech-to-text, after which the text is       parsed into a grammatical structure (POS tagging) using a custom heuristics-based parser.  The resulting atoms are           resolved with the help of the knowledge base to ground concepts like objects. 
 
     Link to  own  project:  This  article  shows  an  interesting  way  to  perform natural language grounding, which I could     also use for my thesis, since I will be working with a knowledge base as well.
     
-    Key  words: human-robot  interaction, POS  tagging,  natural  language grounding, speech-to-text, heuristics-based parser
-    
 4.  Summary of Grounding the Interaction: Anchoring Situated Discourse in Everyday Human-Robot Interaction [Lemaignan et al.,     2012]:  This paper explains exactly how the natural language grounding of the previous paper is done. Three categories of     sentences are produced:  statements,  desires and questions that can be answered from the declarative knowledge present       in the robot knowledge base.  The grounding process consists of extracting either the informational content of the           sentence to produce statements or its intentional content to collect orders and questions. The module processes human         input in natural language, grounds the concepts in the robot’s knowledge and eventually translates the discourse in a set     of queries or declarative OWL/RDF statements.
 
     Link to own project: The grounding process could be used to find out what the barman is talking about.
-    
-    Key words: natural language grounding, knowledge base, OWL, RDF
+
+### Friday 21/04/2017
+
+Interesting papers:
+
+5.  Summary of Development  of  a  tour–guide  robot  using dialogue models and a cognitive architecture [Avilés et al.,         2010]: Shows how a tour guide robot is able to navigate around its environment, visually identify informational posters       and explain sections of the poster that users request via pointing gestures. The task that the robot performs is             determined by a dialogue model, which defines conversational situations, expectations and robot actions. Speech               recognition is based on general acoustic-phonetic models. When a sentence is recognised, the speech is interpreted by         comparing the sentence with a set of equivalent regular expressions defined for each expectation. If no match is found,       the user is requested for another attempt.
+
+    Link to own project:  Shows that earlier speech interpretation work was done  using  regular  expressions. This  article     also  shows  a  really  clear way to create a dialogue  model, which I could use as inspiration to create my own.
