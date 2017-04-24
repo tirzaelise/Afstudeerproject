@@ -70,4 +70,12 @@ Interesting papers:
 
     Link to own project:  Shows that earlier speech interpretation work was done  using  regular  expressions. This  article     also  shows  a  really  clear way to create a dialogue  model, which I could use as inspiration to create my own.
     
+6.  Summary of Designing and evaluating an adaptive spoken dialogue system [Litman and Pan, 2002]: Presents the design and       evaluation of an adaptive spoken dialogue system (TOOT), which  retrieves online train schedules. It constructs a user       model whether the user is having speech recognition problems as the dialogue progresses, based on rules learned from a       set of training dialogues. In which case it automatically adapts the dialogue strategies.
+
+    Link to own project: This article shows a clear algorithm that determines when to change the dialogue strategy if there       have been speech recognition problems.
+    
 I also read a lot of papers about natural language generation and creating dialogues, but I couldn't find anything that was interesting for my project. 
+
+## Monday 24/04/2017
+
+I spent the entire day working on my research proposal and making a planning until the final deadline.
