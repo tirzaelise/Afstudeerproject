@@ -83,3 +83,7 @@ I spent the entire day working on my research proposal and making a planning unt
 ## Tuesday 25/04/2017
 
 I spent the entire working on my research proposal and my presentation.
+
+## Wednesday 26/04/2017
+
+I held my research proposal presentation in the morning and then I spent the entire day working on my research proposal document again.
