@@ -79,3 +79,7 @@ I also read a lot of papers about natural language generation and creating dialo
 ## Monday 24/04/2017
 
 I spent the entire day working on my research proposal and making a planning until the final deadline.
+
+## Tuesday 25/04/2017
+
+I spent the entire working on my research proposal and my presentation.
