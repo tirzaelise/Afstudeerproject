@@ -90,4 +90,4 @@ I held my research proposal presentation in the morning and then I spent the ent
 
 ## Monday 01/05/2017
 
-Started working on the drinks database. The ADDb API structure of a drink is as contains the following properties that are interesting for my project: name, description, descriptionPlain, color, skill, isAlcoholic, isCarbonated, isHot, ingredients, tastes, occasions, tools, drinkTypes, actions. I wanted to work with AsyncTasks since I have done this before, but then I realised that this is only available for Java coding for Android. 
+Started working on the drinks database. The ADDb API structure of a drink is as contains the following properties that are interesting for my project: name, descriptionPlain, color, skill, isAlcoholic, isCarbonated, isHot, ingredients, tastes, occasions, tools, actions. I tried to work with AsyncTasks since I have done this before, but then I realised that this is only available for Java coding for Android. Therefore, I chose to work with Python instead. I implemented code to scrape a web page and retrieve all the interesting properties to put create a Drink object.
