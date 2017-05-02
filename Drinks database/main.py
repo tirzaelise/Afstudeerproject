@@ -43,16 +43,16 @@ def update_database(data, drinks_dict):
         info = get_info(element)
         make_drink = getattr(drink, "create_drink")
         drink_object = make_drink(info[0], info[1], info[2], info[3], info[4],
-            info[5], info[6],info[7], info[8], info[9], info[10], info[11])
+                                  info[5], info[6], info[7], info[8], info[9],
+                                  info[10], info[11])
         drinks_dict.update({drink_object.name: drink_object})
-
 
 
 # Retrieves the requested properties of a drink and returns them in a list.
 def get_info(drink):
     properties = ["name", "descriptionPlain", "color", "skill", "isAlcoholic",
-    "isCarbonated", "isHot", "ingredients", "tastes", "occasions", "tools",
-    "actions"]
+                  "isCarbonated", "isHot", "ingredients", "tastes", "occasions",
+                  "tools", "actions"]
     info = []
 
     for drink_property in properties:
@@ -66,9 +66,9 @@ def get_info(drink):
 
 
 # Converts a JSON array into an array that only holds the text values.
-def json_to_array(jsonArray):
+def json_to_array(json_array):
     array = []
-    for element in jsonArray:
+    for element in json_array:
         string = element.get("text")
         string = string.replace("[", "")
         string = string.replace("]", "")

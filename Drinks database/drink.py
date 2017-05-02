@@ -15,7 +15,8 @@ class Drink(object):
         self.tools = tools
         self.actions = actions
 
+
 def create_drink(name, description, color, skill, is_alcoholic, is_carbonated,
-                is_hot, ingredients, tastes, occasions, tools, actions):
+                 is_hot, ingredients, tastes, occasions, tools, actions):
     return Drink(name, description, color, skill, is_alcoholic, is_carbonated,
-        is_hot, ingredients, tastes, occasions, tools, actions)
+                 is_hot, ingredients, tastes, occasions, tools, actions)
