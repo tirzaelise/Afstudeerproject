@@ -94,4 +94,4 @@ Started working on the drinks database. The ADDb API structure of a drink is as 
 
 ## Tuesday 02/05/2017
 
-I implemented code to save the database to a Pickle file. The data is saved in a Dictionary using the following format: {drink name: drink object}, which holds name, description, color, skill, is_alcoholic, is_carbonated, is_hot, ingredients, tastes, occasions, tools, actions.
+I implemented code to save the database to a Pickle file. The data is saved in a Dictionary using the following format: {drink name: drink object}, which holds name, description, color, skill, is_alcoholic, is_carbonated, is_hot, ingredients, tastes, occasions, tools, actions. Also started working on the outline of my thesis.
