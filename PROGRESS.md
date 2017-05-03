@@ -1,4 +1,4 @@
-### Thursday 13/04/2017
+## Thursday 13/04/2017
 
 <b>Assignment</b> </br>
 
@@ -22,7 +22,7 @@ provide a list of 3 alternatives.
 
 Find literature that explains how to build a conversation and a narrative, as well as how to connect them to a knowledge system. 
 
-### Wednesday 19/04/2017
+## Wednesday 19/04/2017
 
 Interesting papers:
 
@@ -31,7 +31,7 @@ Interesting papers:
 
     Link to own project:  Multimodal categorisation is a method to form categories and concepts based on experience, which       could be used to create and update the knowledge base of the robot.  Spatial concept formation organises the robot’s         memory to integrate information about places, names, objects, and tasks related to a place, which could be used to create     the link between a customer, their drink order and their position.
     
-### Thursday 20/04/2017
+## Thursday 20/04/2017
 
 Meeting points:
 
@@ -62,7 +62,7 @@ Interesting papers:
 
     Link to own project: The grounding process could be used to find out what the barman is talking about.
 
-### Friday 21/04/2017
+## Friday 21/04/2017
 
 Interesting papers:
 
@@ -95,3 +95,9 @@ Started working on the drinks database. The ADDb API structure of a drink is as 
 ## Tuesday 02/05/2017
 
 I implemented code to save the database to a Pickle file. The data is saved in a Dictionary using the following format: {drink name: drink object}, which holds name, description, color, skill, is_alcoholic, is_carbonated, is_hot, ingredients, tastes, occasions, tools, actions. Also started working on the outline of my thesis.
+
+## Wednesday 03/05/2017
+
+Read a lot of articles about natural language understanding and installed NLTK and practNLPTools (https://github.com/biplab-iitb/practNLPTools). The following articles might be interesting: https://pdfs.semanticscholar.org/ebe9/78c21cbc2a9e738b9fc9d257bbab2e093177.pdf?_ga=2.136246065.1014586811.1493814151-298941096.1493655434 and https://pdfs.semanticscholar.org/82c9/f475651e49c7eb8e98609fbdc4d8cc7c432a.pdf?_ga=2.183449966.919437324.1493810378-298941096.1493655434
+
+practNLPTools can do semantic role labeling, syntactic parsing, part of speech tagging, named entity recognition, dependency parsing, shallow chunking. For my thesis, I am interested in semantic role labeling, part of speech tagging, named entity recognition and shallow chunking.
