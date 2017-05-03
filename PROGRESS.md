@@ -101,3 +101,23 @@ I implemented code to save the database to a Pickle file. The data is saved in a
 Read a lot of articles about natural language understanding and installed NLTK and practNLPTools (https://github.com/biplab-iitb/practNLPTools). The following articles might be interesting: https://pdfs.semanticscholar.org/ebe9/78c21cbc2a9e738b9fc9d257bbab2e093177.pdf?_ga=2.136246065.1014586811.1493814151-298941096.1493655434 and https://pdfs.semanticscholar.org/82c9/f475651e49c7eb8e98609fbdc4d8cc7c432a.pdf?_ga=2.183449966.919437324.1493810378-298941096.1493655434
 
 practNLPTools can do semantic role labeling, syntactic parsing, part of speech tagging, named entity recognition, dependency parsing, shallow chunking. For my thesis, I am interested in semantic role labeling, part of speech tagging, named entity recognition and shallow chunking.
+
+Conversation with Frank Nack:
+- Starting point: What drinks from the menu can the barman make? 
+- How important is a certain ingredient for a drink? Maybe there aren't any lemons, but the drink can also be prepared without a lemon.
+- How does the robot communicate to the customer that there aren't any lemons available?
+- Use 'tastes' and main ingredient to search for replacement drinks: "Would you like this drink instead of your ordered drink?"
+- The dialogue model should represent that the robot takes on two different roles: asking questions and giving explanations
+- How is a question built? -> Short and clear, a model that expects an answer
+- How is an answer/explanation to a question built? -> A short list of ranked alternatives
+- "This replacement comes closest to your ordered drink in taste"
+- Be friendly to the customer but clear and short to the barman
+- Use a set of templates for questions -> Elizabeth Andre (shopping assistants)
+- Generate the question from the answer (flexible, but grammatical difficulties)
+- Pattern matching 
+- Description of the ingredients: "We use this type of ingredient in this drink, which is a bit more bitter than the other type."
+- Write communication scenarios
+- Generate questions based on what the customer wants
+- Use a description cloud to ask the barman questions
+- How should you ask a question such that you can use the template?
+
