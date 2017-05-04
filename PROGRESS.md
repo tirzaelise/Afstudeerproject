@@ -121,3 +121,6 @@ Conversation with Frank Nack:
 - Use a description cloud to ask the barman questions
 - How should you ask a question such that you can use the template?
 
+## Thursday 04/05/2017
+
+I implemented code to convert a sentence into a logical form, for which I use the sentence's main verb, subject, object and (optional) negation. The sentence 'We do not have any ice' turns into have(not, we, ice). This is done using the practNLPTools semantic role labeling function. The logical trnnslation is still very basic and will need to be improved. In order to make sure 'any' is not translated into the logical form, I assumed that the ending of a noun phrase is always the main noun.
