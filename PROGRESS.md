@@ -123,4 +123,8 @@ Conversation with Frank Nack:
 
 ## Thursday 04/05/2017
 
-I implemented code to convert a sentence into a logical form, for which I use the sentence's main verb, subject, object and (optional) negation. The sentence 'We do not have any ice' turns into have(not, we, ice). This is done using the practNLPTools semantic role labeling function. The logical trnnslation is still very basic and will need to be improved. In order to make sure 'any' is not translated into the logical form, I assumed that the ending of a noun phrase is always the main noun.
+I implemented code to convert a sentence into a logical form, for which I use the sentence's main verb, subject, object and (optional) negation. The sentence 'We do not have any ice' turns into have(not, we, ice). This is done using the practNLPTools semantic role labeling function. The logical translation is still very basic and will need to be improved. In order to make sure 'any' is not translated into the logical form, I assumed that the ending of a noun phrase is always the main noun.
+
+## Tuesday 09/05/2017
+
+I spent today improving the code I wrote to convert a natural sentence into its logical form. I did this using the dependency parse of practNLPTools. I am also starting to consider the fact that this might not be the best way to understand natural language and that machine learning would be a better option. But I need a data set if I want to do machine learning so I am looking into that right now. I also approached a language expert via e-mail and hope that they will reply and can help me.
