@@ -141,3 +141,5 @@ ERICA: The ERATO Intelligent Conversational Android</a>: The dialogue module com
 I noticed that a lot of state-of-the-art technologies used rule-based natural language understanding and natural language generation. Therefore, I decided to keep working in a rule-based manner. I wanted to combine rule-based NLP and machine learning, but I don't think I will have enough time to do this. Especially since I would also have to find a data set.
 
 I rewrote a lot of code to understand natural language. Parsing is now done using StanfordDependencyParser, because this picked up on negations a lot better and it was a lot easier to work with than pracTNLPTools. I also started working on using NLTK's WordNet to find synonyms of verbs and nouns so that the robot can understand what is being said in a sentence.
+
+Things that need to be done: Check whether a sentence is a question, this would change the dialogue path that has to be taken. Create a list of key words that holds most of the information about drinks that is in the database so that they can be checked for the NLU module.
