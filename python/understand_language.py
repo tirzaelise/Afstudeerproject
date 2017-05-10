@@ -1,10 +1,7 @@
 # !/usr/bin/env python2
 
-
-import nltk
-import os
-import pickle
-from practnlptools.tools import Annotator
+from nltk import word_tokenize, pos_tag
+from nltk.parse.stanford import StanfordDependencyParser
 from pprint import pprint
 
 
@@ -14,53 +11,47 @@ def load_database():
         return pickle.load(open("database.pkl", "rb"))
 
 
-# Annotates a sentence.
-def annotate_sentence(sentence):
-    annotator = Annotator()
+# Loads the Stanford Dependency Parser.
+def load_parser():
+    jar_path = "stanford-parser-full-2016-10-31/stanford-parser.jar"
+    models_path = "stanford-parser-full-2016-10-31/stanford-parser-" + \
+        "3.7.0-models.jar"
+    return StanfordDependencyParser(path_to_jar=jar_path,
+                                    path_to_models_jar=models_path)
 
-    annotated_sentence = annotator.getAnnotations(sentence, dep_parse=True)
-    dependency_parse = annotated_sentence["dep_parse"].split("\n")
-    found_verbs = annotated_sentence["verbs"]
-    return dependency_parse, found_verbs
+
+# Uses the Stanford Dependency Parser to parse a sentence.
+def parse_sentence(parser, sentence):
+    result = parser.raw_parse(sentence)
+    dep = result.next()
+    return list(dep.triples())
 
 
-# Converts a sentence into its logical form.
-def convert_sentences(dependency_parse, found_verbs):
+# Returns all the verbs in a sentence.
+def get_verbs(sentence):
+    verbs = []
+    tokenized_sentence = word_tokenize(sentence)
+    tagged_sentence = pos_tag(tokenized_sentence)
+
+    for word in tagged_sentence:
+        if word[1].startswith("VB"):
+            verbs.append(word[0])
+    return verbs
+
+
+# Analyses a sentence: returns the subject, verb and object.
+def analyse_sentence(verbs, sentence):
     subjects = []
     objects = []
-    verbs = []
     negations = []
-    logical_sentences = []
 
-    root_verb = get_root_verb(dependency_parse)
-    verbs.append(root_verb)
-    subjects.append(get_function_word(dependency_parse, root_verb, "nsubj"))
-    objects.append(get_function_word(dependency_parse, root_verb, "dobj"))
-    negations.append(get_function_word(dependency_parse, root_verb, "neg"))
-
-    for verb in found_verbs:
-        if verb == root_verb:
-            continue
-        else:
-            verbs.append(verb)
-            subjects.append(get_function_word(dependency_parse, verb, "nsubj"))
-            objects.append(get_function_word(dependency_parse, verb, "dobj"))
-            negations.append(get_function_word(dependency_parse, verb, "neg"))
-
-    for i in range(0, len(verbs)):
-        logical_sentence = get_logical_form(subjects[i], objects[i],
-                                                verbs[i], negations[i])
-        logical_sentences.append(logical_sentence)
-    return logical_sentences
-
-
-# Returns the root verb of a sentence.
-def get_root_verb(sentence):
-    for word in sentence:
-        function, words = word.split("(")
-        if function == "root":
-            root_verb = words.split(",")[1].split("-")[0]
-    return root_verb.replace(" ", "")
+    for verb in verbs:
+        subjects.append(get_function_word(sentence, verb, "nsubj"))
+        objects.append(get_function_word(sentence, verb, "dobj"))
+        negations.append(get_function_word(sentence, verb, "neg"))
+    verbs, subjects, objects, negations = correct_functions(verbs, subjects,
+                                                            objects, negations)
+    return verbs, subjects, objects, negations
 
 
 # Returns the word that has the requested function in a sentence.
@@ -68,14 +59,41 @@ def get_function_word(sentence, verb, requested_function):
     function_word = None
 
     for word in sentence:
-        function, words = word.split("(")
-        if function == requested_function and verb in words:
-            function_word = words.split(",")[1].split("-")[0].replace(" ", "")
+        if word[1] == requested_function and word[0][0] == verb:
+            function_word = word[2][0]
     return function_word
 
 
-# Returns the logical form of a natural sentence.
-def get_logical_form(subject, s_object, verb, negation):
+# Sometimes a verb, that does not have a subject, is found. A sentence needs to
+# have both a subject and a verb in order to form a sentence so then that verb
+# can be omitted.
+def correct_functions(verbs, subjects, objects, negations):
+    i = 0
+
+    for subject in subjects:
+        if not subject:
+            del verbs[i]
+            del subjects[i]
+            del objects[i]
+            del negations[i]
+        i +=1
+    return verbs, subjects, objects, negations
+
+
+# Returns the logical form of a sentence using a verb, subject, object and
+# negation.
+def get_logical_form(verbs, subjects, objects, negations):
+    logical_forms = []
+
+    for i in range(0, len(subjects)):
+        logical_forms.append(natural_to_logic(verbs[i], subjects[i], objects[i],
+                             negations[i]))
+    return logical_forms
+
+
+# Uses a verb, subject, object and negation to create a logical form of a
+# natural sentence.
+def natural_to_logic(verb, subject, s_object, negation):
     if negation:
         if s_object:
             form = verb + "(" + negation +  ", " + subject + ", " + s_object + \
@@ -90,48 +108,11 @@ def get_logical_form(subject, s_object, verb, negation):
     return form
 
 
-# # Retrieves the interesting roles in a sentence.
-# def label_sentence(annotated_sentence):
-#     logical_forms = []
-#
-#     for sentence in annotated_sentence["srl"]:
-#         print sentence
-#         verb = sentence.get("V")
-#         s_subject = sentence.get("A0")
-#         s_object = sentence.get("A1")
-#         negation = sentence.get("AM-NEG")
-#         logical_form = logical_sentence(verb, s_subject, s_object, negation)
-#         logical_forms.append(logical_form)
-#     return logical_forms
-
-
-# # Converts a sentence into its logical form.
-# def logical_sentence(verb, s_subject, s_object, negation):
-#     if len(s_object.split(" ")) > 1:
-#         s_object = s_object.split(" ")[-1]
-#
-#     if len(s_subject.split(" ")) > 1:
-#         s_subject = s_subject.split(" ")[-1]
-#
-#     if negation:
-#         sentence = verb + "(" + negation +  ", " + s_subject + ", " + s_object + ")"
-#     else:
-#         sentence = verb + "(" + s_subject + ", " + s_object + ")"
-#     return sentence
-
-
 if __name__ == "__main__":
-    database = load_database()
-
-    if database:
-        print "Database loaded successfully"
-    else:
-        print "Database failed to loaded"
-    print
-
-    sentence = "I do not have any lemons. Would you like a different drink?"
-    dependency_parse, verbs = annotate_sentence(sentence)
-    print convert_sentences(dependency_parse, verbs)
-    sentence = "There are not any lemons. Would you like a different drink?"
-    dependency_parse, verbs = annotate_sentence(sentence)
-    print convert_sentences(dependency_parse, verbs)
+    sentence = "No, sorry, I do not have any lemons."
+    parser = load_parser()
+    parsed_sentence = parse_sentence(parser, sentence)
+    verbs = get_verbs(sentence)
+    verbs, subjects, objects, negations = analyse_sentence(verbs,
+                                                           parsed_sentence)
+    print get_logical_form(verbs, subjects, objects, negations)
