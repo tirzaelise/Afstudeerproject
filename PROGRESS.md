@@ -138,4 +138,6 @@ Articles: <a href="http://www6.in.tum.de/Main/Publications/giuliani-etal-icmi201
 Natural Language Understanding in <a href="http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7745086">
 ERICA: The ERATO Intelligent Conversational Android</a>: The dialogue module compares received speech recognition results against a list of keywords. The utterance content and transition rules were scripted by hand. 
 
-I noticed that a lot of state-of-the-art technologies used rule-based natural language understanding and natural language generation.
+I noticed that a lot of state-of-the-art technologies used rule-based natural language understanding and natural language generation. Therefore, I decided to keep working in a rule-based manner. I wanted to combine rule-based NLP and machine learning, but I don't think I will have enough time to do this. Especially since I would also have to find a data set.
+
+I rewrote a lot of code to understand natural language. Parsing is now done using StanfordDependencyParser, because this picked up on negations a lot better and it was a lot easier to work with than pracTNLPTools. I also started working on using NLTK's WordNet to find synonyms of verbs and nouns so that the robot can understand what is being said in a sentence.
