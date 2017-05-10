@@ -127,4 +127,15 @@ I implemented code to convert a sentence into a logical form, for which I use th
 
 ## Tuesday 09/05/2017
 
-I spent today improving the code I wrote to convert a natural sentence into its logical form. I did this using the dependency parse of practNLPTools. I am also starting to consider the fact that this might not be the best way to understand natural language and that machine learning would be a better option. But I need a data set if I want to do machine learning so I am looking into that right now. I also approached a language expert via e-mail and hope that they will reply and can help me.
+I spent today improving the code I wrote to convert a natural sentence into its logical form. I did this using the dependency parse of practNLPTools. I am also starting to consider the fact that this might not be the best way to understand natural language and that machine learning would be a better option. But I need a data set if I want to do machine learning so I am looking into that right now. I also approached a language expert via e-mail and hope that they will reply and can help me. 
+
+All the articles I read today did natural language understanding the same way. They had a Kinect microphone and used the Microsoft Kinect API for Windows, which produces a list of recognition hypotheses, an estimated confidence score and an estimate of the sound source angle and the angle confidence. The hypotheses are parsed to extract the syntactic and semantic information using a grammar implemented in OpenCCG.
+
+Articles: <a href="http://www6.in.tum.de/Main/Publications/giuliani-etal-icmi2013.pdf">Comparing Task-Based and Socially Intelligent Behaviour in a Robot Bartender</a>, <a href="https://pdfs.semanticscholar.org/0f56/e1e51d6ede6ccd0574c8de00c61dbeec7ee2.pdf">Planning for Social Interaction in a Robot Bartender Domain</a>, <a href="http://delivery.acm.org/10.1145/2560000/2559805/p158-foster.pdf?ip=145.109.9.139&id=2559805&acc=ACTIVE%20SERVICE&key=0C390721DC3021FF%2E86041C471C98F6DA%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35&CFID=758042946&CFTOKEN=40200894&__acm__=1494344056_5f4b4cbeb76b7a77e6ea117fd780c987">Towards Action Selection Under Uncertainty for a Socially Aware Robot Bartender</a>, <a href="http://delivery.acm.org/10.1145/2530000/2522879/p255-foster.pdf?ip=145.109.9.139&id=2522879&acc=ACTIVE%20SERVICE&key=0C390721DC3021FF%2E86041C471C98F6DA%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35&CFID=758042946&CFTOKEN=40200894&__acm__=1494340708_5a86503f527915101d3a25b8398bcaa7">How Can I Help You? Comparing Engagement Classification Strategies for a Robot Bartender</a>
+
+## Wednesday 10/05/2017
+
+Natural Language Understanding in <a href="http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7745086">
+ERICA: The ERATO Intelligent Conversational Android</a>: The dialogue module compares received speech recognition results against a list of keywords. The utterance content and transition rules were scripted by hand. 
+
+I noticed that a lot of state-of-the-art technologies used rule-based natural language understanding and natural language generation.
