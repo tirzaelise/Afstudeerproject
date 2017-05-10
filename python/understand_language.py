@@ -1,6 +1,7 @@
 # !/usr/bin/env python2
 
 from nltk import word_tokenize, pos_tag
+from nltk.corpus import wordnet as wn
 from nltk.parse.stanford import StanfordDependencyParser
 from pprint import pprint
 
@@ -46,12 +47,23 @@ def analyse_sentence(verbs, sentence):
     negations = []
 
     for verb in verbs:
-        subjects.append(get_function_word(sentence, verb, "nsubj"))
-        objects.append(get_function_word(sentence, verb, "dobj"))
-        negations.append(get_function_word(sentence, verb, "neg"))
+        subjects = get_function_list(subjects, sentence, verb, "nsubj")
+        objects = get_function_list(objects, sentence, verb, "dobj")
+        negations = get_function_list(negations, sentence, verb, "neg")
     verbs, subjects, objects, negations = correct_functions(verbs, subjects,
                                                             objects, negations)
     return verbs, subjects, objects, negations
+
+
+# Returns a list that holds the newly found word that fulfills a certain
+# function in a sentence.
+def get_function_list(function_list, sentence, verb, function):
+    function_word = get_function_word(sentence, verb, function)
+    if function_word:
+        # function_word = get_synomyms(function_word)
+        synonyms = get_synomyms(function_word)
+    function_list.append(function_word)
+    return function_list
 
 
 # Returns the word that has the requested function in a sentence.
@@ -60,8 +72,20 @@ def get_function_word(sentence, verb, requested_function):
 
     for word in sentence:
         if word[1] == requested_function and word[0][0] == verb:
-            function_word = word[2][0]
+            if requested_function == "neg":
+                function_word = "not"
+            else:
+                function_word = word[2][0]
     return function_word
+
+
+# Get the synonyms of a word using NLTK's WordNet.
+def get_synomyms(word):
+    synonyms = wn.synsets(word)
+    for synonym in synonyms:
+        for synonym_name in synonym.lemma_names():
+            synonym_name = synonym_name.replace("_", " ")
+            
 
 
 # Sometimes a verb, that does not have a subject, is found. A sentence needs to
@@ -109,10 +133,11 @@ def natural_to_logic(verb, subject, s_object, negation):
 
 
 if __name__ == "__main__":
-    sentence = "No, sorry, I do not have any lemons."
+    sentence = "Do you have any lemons for me?"
     parser = load_parser()
     parsed_sentence = parse_sentence(parser, sentence)
     verbs = get_verbs(sentence)
     verbs, subjects, objects, negations = analyse_sentence(verbs,
                                                            parsed_sentence)
-    print get_logical_form(verbs, subjects, objects, negations)
+    logical_forms =  get_logical_form(verbs, subjects, objects, negations)
+    print logical_forms
