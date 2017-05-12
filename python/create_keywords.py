@@ -50,6 +50,13 @@ def split_string(string):
     return string_list
 
 
+# Flattens the list of key words, removes duplicates and removes None types.
+def clean_keywords(key_words):
+    flattened_list = list(flatten(key_words))
+    key_words = remove_duplicates(flattened_list)
+    return [key_word for key_word in key_words if key_word is not None]
+
+
 # Removes the measurements from the ingredients such that "1/2 part lime"
 # becomes "lime".
 def only_ingredients(ingredients):
@@ -78,7 +85,7 @@ def remove_measurements(string):
 def flatten(unflattened_list):
     for element in unflattened_list:
         if isinstance(element, collections.Iterable) and not \
-        isinstance(element, basestring):
+           isinstance(element, basestring):
             for subelement in flatten(element):
                 yield subelement
         else:
@@ -91,31 +98,33 @@ def remove_duplicates(key_words):
 
 
 # Returns all the synonyms of the key words and saves them in a list, including
-# the original key words.
+# the original key words. The synonyms are obtained using PyDictionary.
 def get_synonyms(key_words):
     dictionary = PyDictionary()
     final_keywords = []
 
     for key_word in key_words:
-        key_word = key_word.encode("utf-8")
-        final_keywords.append(key_word)
-        synonyms = dictionary.synonym(key_word)
+        if key_word:
+            key_word = key_word.encode("utf-8").lower()
+            final_keywords.append(key_word)
+            synonyms = dictionary.synonym(key_word)
 
-        if synonyms:
-            for synonym in synonyms:
-                final_keywords.append(synonym)
+            if synonyms:
+                for synonym in synonyms:
+                    final_keywords.append(synonym.lower())
     return final_keywords
 
 
 # Saves the key words in a Pickle file.
 def save_keywords(key_words):
-    if os.path.exists("key_words.pkl"):
+    if not os.path.exists("key_words.pkl"):
         pickle.dump(key_words, open("key_words.pkl", "wb"))
 
 
 if __name__ == "__main__":
     database = load_database()
     key_words = make_keywords()
-    flattened_list = list(flatten(key_words))
-    key_words = remove_duplicates(flattened_list)
-    final_keywords = get_synonyms(key_words)
+    cleaned_keywords = clean_keywords(key_words)
+    final_keywords = get_synonyms(cleaned_keywords)
+    save_keywords(final_keywords)
+    print len(final_keywords)
