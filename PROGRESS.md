@@ -143,3 +143,17 @@ I noticed that a lot of state-of-the-art technologies used rule-based natural la
 I rewrote a lot of code to understand natural language. Parsing is now done using StanfordDependencyParser, because this picked up on negations a lot better and it was a lot easier to work with than pracTNLPTools. I also started working on using NLTK's WordNet to find synonyms of verbs and nouns so that the robot can understand what is being said in a sentence.
 
 Things that need to be done: Check whether a sentence is a question, this would change the dialogue path that has to be taken. Create a list of key words that holds most of the information about drinks that is in the database so that they can be checked for the NLU module.
+
+## Thursday 11/05/2017
+
+I wrote code to get all synonyms of a word using <a href="https://pypi.python.org/pypi/PyDictionary/1.3.4">PyDictionary</a>. I was going to use this to get all synonyms of the words in a natural sentence and check these against a list of key words. However, this is quite slow. Therefore, I am now going to generate the synonyms of all the words in the list of key words instead and hope this is faster to use. I wrote code to generate the key words, which was done using the drinks database. The key words are: the names of the drinks, the names of the drinks split on spaces, the descriptions of how to make the drinks split on spaces, the color of the drinks, the required skill level to make the drinks, the ingredients of the drinks, the occassions on which the drinks can be drunk, the tools required to make the drinks, and the actions required to make the drinks. I tried to run the code at night, unfortunately, but there was a bug.
+
+Meeting points:
+- Generate synonyms of key words instead of the words in a natural sentence
+- Glue AI for a conversation model (Java)
+- Story chat for story lines of stories and TV shows
+- Use an evaluation form that people can fill in after testing the program: How natural was the conversation?
+- Create a training and a test data set
+- Evaluation: What's important is how the program came to the conclusion of what drinks were missing
+- Evaluate how natural and robust the conversation was
+- Thesis: What is necessary knowledge in order to understand the literature. What would you have wanted to know about natural dialogue before you started working?
