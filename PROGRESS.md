@@ -157,3 +157,9 @@ Meeting points:
 - Evaluation: What's important is how the program came to the conclusion of what drinks were missing
 - Evaluate how natural and robust the conversation was
 - Thesis: What is necessary knowledge in order to understand the literature. What would you have wanted to know about natural dialogue before you started working?
+
+## Friday 12/05/2017
+
+I looked into using the Cheers script as a data set. One of the scripts I found was not annotated with a name so I would not be able to determine who is speaking without labeling this manually. Another script I found was annotated with a name, but in a scanned PDF format so I cannot parse this automatically.
+
+I debugged the code to create the key words (24241 words). There is done a check to see if the words in a natural sentence occur in the key words. If they don't, then a string is generated that indicates what functions in the sentence were not understood. 
