@@ -126,11 +126,6 @@ def ask_clarification(unknown_functions):
     return clarification
 
 
-
-def rreplace(s, old, new, occurrence):
-    li = s.rsplit(old, occurrence)
-    return new.join(li)
-
 # Returns the logical form of a sentence using a verb, subject, object and
 # negation.
 def get_logical_form(verbs, subjects, objects, negations):
@@ -171,7 +166,6 @@ if __name__ == "__main__":
     # print "Parser:", time.time() - start_time
     # start_time = time.time()
     key_words = load_keywords()
-    print len(key_words)
     # print "Key words:", time.time() - start_time
     # start_time = time.time()
     parsed_sentence = parse_sentence(parser, sentence)
