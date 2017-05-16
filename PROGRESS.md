@@ -160,6 +160,10 @@ Meeting points:
 
 ## Friday 12/05/2017
 
-I looked into using the Cheers script as a data set. One of the scripts I found was not annotated with a name so I would not be able to determine who is speaking without labeling this manually. Another script I found was annotated with a name, but in a scanned PDF format so I cannot parse this automatically.
+I looked into using the Cheers script as a data set. One of the scripts I found was not annotated with a name so I would not be able to determine who is speaking without labeling this manually. Another script I found was annotated with a name, but in a scanned PDF format so I cannot parse this automatically. I also spent a lot of time looking at other data sources online, but I wasn't able to find anything.
 
 I debugged the code to create the key words (24241 words). There is done a check to see if the words in a natural sentence occur in the key words. If they don't, then a string is generated that indicates what functions in the sentence were not understood. 
+
+## Monday 13/05/2017
+
+I worked on updating the knowledge base of ordered drinks once you receive information from a sentence. I am currently trying to do this with Wordnet's hypernyms, but it does not work well yet. I also rewrote my database code and it is now a Dictionary that holds: {drink name: list of drink properties}.
