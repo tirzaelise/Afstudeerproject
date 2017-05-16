@@ -16,8 +16,6 @@ def load_database():
 # description, color, required skill level, ingredients, tastes, occasions,
 # tools and actions.
 def make_keywords():
-    properties = ["name", "description", "color", "skill", "ingredients",
-                  "tastes", "occasions", "tools", "actions"]
     key_words = ["alcoholic", "description", "carbonated", "hot", "cold",
                  "skill", "color", "tastes", "occasions", "tools", "actions"]
 

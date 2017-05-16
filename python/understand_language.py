@@ -1,6 +1,7 @@
 # !/usr/bin/env python2
 
 from nltk import word_tokenize, pos_tag
+from nltk.corpus import wordnet as wn
 from nltk.parse.stanford import StanfordDependencyParser
 import os
 import pickle
@@ -8,13 +9,13 @@ from pprint import pprint
 import time
 
 
-# Loads the database.
+# Loads the database of drinks, which is a Python Dictionary.
 def load_database():
     if os.path.exists("database.pkl"):
         return pickle.load(open("database.pkl", "rb"))
 
 
-# Loads the Stanford Dependency Parser.
+# Loads the Stanford Dependency Parser to parse sentences.
 def load_parser():
     jar_path = "stanford-parser-full-2016-10-31/stanford-parser.jar"
     models_path = "stanford-parser-full-2016-10-31/stanford-parser-" + \
@@ -93,94 +94,114 @@ def correct_functions(verbs, subjects, objects, negations):
     return verbs, subjects, objects, negations
 
 
-# Checks if the found verbs, subjects and objects are in the key words and does
-# an action accordingly.
-def check_keywords(verbs, subjects, objects, key_words):
-    unknown_functions = []
-
+# Checks if the found verbs, subjects and objects are in the key words. If they
+# are, the list of ordered drinks is updated with the new information. If they
+# aren't, the robot asks for clarification.
+def do_action(verbs, subjects, objects, negations, key_words, ordered_drinks):
     for i in range(0, len(verbs)):
-        if verbs[i]:
-            if verbs[i].encode("utf-8") not in key_words:
-                unknown_functions.append("verb")
-        if subjects[i]:
-            if subjects[i].encode("utf-8") not in key_words:
-                unknown_functions.append("subject")
-        if objects[i]:
-            if objects[i].encode("utf-8") not in key_words:
-                unknown_functions.append("object")
-        if len(unknown_functions) != 0:
-            print ask_clarification(unknown_functions)
+        unknown_words = check_keywords(verbs[i], subjects[i], objects[i],
+                                       key_words)
+        # if len(unknown_words) != 0:
+        #     clarification = ask_clarification(unknown_words)
+        #     print clarification
+        # else:
+        update_database(verbs[i], subjects[i], objects[i], negations[i],
+                        ordered_drinks)
 
 
-# Returns a sentence that asks for clarification given the functions in the
-# sentence that were not understood.
-def ask_clarification(unknown_functions):
-    variable_functions = ", ".join(unknown_functions)
+# Checks if the found verb, subject and object are in the list of key words.
+# Returns a list that contains the words that were not found in the key
+# words.
+def check_keywords(verb, subject, s_object, key_words):
+    unknown_words = []
 
-    if len(unknown_functions) > 1:
-        k = variable_functions.rfind(", ")
-        variable_functions = variable_functions[:k] + " and" + \
-                             variable_functions[k+1:]
-    clarification = "I did not understand the " + variable_functions + " in" + \
-                    " your sentence."
+    if verb:
+        if verb.encode("utf-8") not in key_words:
+            unknown_words.append(verb)
+    if subject:
+        if subject.encode("utf-8") not in key_words:
+            unknown_words.append(subject)
+    if s_object:
+        if s_object.encode("utf-8") not in key_words:
+            unknown_words.append(s_object)
+    return unknown_words
+
+
+# Returns a sentence that asks for clarification given the words in the
+# sentence that were not understood, because they are not in the list of key
+# words.
+def ask_clarification(unknown_words):
+    variable_words = ", ".join(unknown_words)
+
+    if len(unknown_words) > 1:
+        k = variable_words.rfind(", ")
+        variable_words = variable_words[:k] + " and" + variable_words[k+1:]
+        clarification = "I did not understand the words " + variable_words + "."
+    else:
+        clarification = "I did not understand the word " + variable_words + "."
     return clarification
 
 
-# Returns the logical form of a sentence using a verb, subject, object and
-# negation.
-def get_logical_form(verbs, subjects, objects, negations):
-    logical_forms = []
+# Uses the verb, subject, object and optional negation that were obtained from
+# a natural language sentence to update the list of ordered drinks.
+def update_database(verb, subject, s_object, negation, ordered_drinks):
+    for drink in ordered_drinks:
+        drink_properties = database.get(drink)
 
-    for i in range(0, len(subjects)):
-        logical_forms.append(natural_to_logic(verbs[i], subjects[i], objects[i],
-                             negations[i]))
-    return logical_forms
+        # if substring_in_list(s_object, drink_properties):
+        find_closest_hypernym(s_object, drink_properties)
 
 
-# Uses a verb, subject, object and negation to create a logical form of a
-# natural sentence. This is done with the knowledge that a sentence is only a
-# sentence if it has a verb and a subject.
-def natural_to_logic(verb, subject, s_object, negation):
-    if negation:
-        if s_object:
-            form = verb + "(" + negation +  ", " + subject + ", " + s_object + \
-                   ")"
-        else:
-            form = verb + "(" + negation +  ", " + subject + ")"
-    else:
-        if s_object:
-            form = verb + "(" + subject + ", " + s_object + ")"
-        else:
-            form = verb + "(" + subject + ")"
-    return form
+# Returns a boolean that indicates whether a substring can be found in a list.
+def substring_in_list(substring, l_ist):
+    new_list = [s for s in l_ist if substring in s]
+    if len(new_list) > 0:
+        return True
+    return False
+
+
+# Finds the drink property that has the shortest distance to a common hypernym
+# between a drink property and a word.
+def find_closest_hypernym(word, drink_properties):
+    shortest_distance = 1000
+
+    for drink_property in drink_properties:
+        property_synsets = wn.synsets(drink_property)
+        word_synsets = wn.synsets(word)
+        property_syn, word_syn, distance = find_best_synset(property_synsets,
+                                                            word_synsets)
+        if distance < shortest_distance:
+            shortest_distance = distance
+            best_property = drink_property
+    print shortest_distance, best_property
+
+
+def find_best_synset(synsets_1, synsets_2):
+    shortest_distance = 1000
+    best_synset_1 = ""
+    best_synset_2 = ""
+
+    for synset_1 in synsets_1:
+        for synset_2 in synsets_2:
+            current_distance = synset_1.shortest_path_distance(synset_2)
+            if current_distance is None:
+                current_distance = 1000
+            if current_distance < shortest_distance:
+                shortest_distance = current_distance
+                best_synset_1 = synset_1
+                best_synset_2 = synset_2
+    return best_synset_1, best_synset_2, shortest_distance
 
 
 if __name__ == "__main__":
-    # start_time = time.time()
-    sentence = "Do you have a lemon for me?"
+    ordered_drinks = ["martini"]
+    sentence = "I don't have any gin."
 
     database = load_database()
-    # print "Database:", time.time() - start_time
-    # start_time = time.time()
     parser = load_parser()
-    # print "Parser:", time.time() - start_time
-    # start_time = time.time()
     key_words = load_keywords()
-    # print "Key words:", time.time() - start_time
-    # start_time = time.time()
     parsed_sentence = parse_sentence(parser, sentence)
-    # print "Parse sentence:", time.time() - start_time
-    # start_time = time.time()
     verbs = get_verbs(sentence)
-    # print "Verbs:", time.time() - start_time
-    # start_time = time.time()
     verbs, subjects, objects, negations = analyse_sentence(verbs,
                                                            parsed_sentence)
-    # print "Analyse sentence:", time.time() - start_time
-    # start_time = time.time()
-    check_keywords(verbs, subjects, objects, key_words)
-    # print "Check keywords:", time.time() - start_time
-    # start_time = time.time()
-    logical_forms =  get_logical_form(verbs, subjects, objects, negations)
-    # print "Logical forms:", time.time() - start_time
-    print logical_forms
+    do_action(verbs, subjects, objects, negations, key_words, ordered_drinks)
