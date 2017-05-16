@@ -37,15 +37,16 @@ def create_database(data):
     return next_url
 
 
-# Creates the database of drinks.
+# Updates the database (Dictionary) of drinks.
 def update_database(data, drinks_dict):
     for element in data.get("result"):
         info = get_info(element)
-        make_drink = getattr(drink, "create_drink")
-        drink_object = make_drink(info[0], info[1], info[2], info[3], info[4],
-                                  info[5], info[6], info[7], info[8], info[9],
-                                  info[10], info[11])
-        drinks_dict.update({drink_object.name: drink_object})
+        # make_drink = getattr(drink, "create_drink")
+        # drink_object = make_drink(info[0], info[1], info[2], info[3], info[4],
+        #                           info[5], info[6], info[7], info[8], info[9],
+        #                           info[10], info[11])
+        # drinks_dict.update({drink_object.name.lower(): drink_object})
+        drinks_dict.update({info[0]: info})
 
 
 # Retrieves the requested properties of a drink and returns them in a list.
@@ -57,34 +58,65 @@ def get_info(drink):
 
     for drink_property in properties:
         property_value = drink.get(drink_property)
+
         if isinstance(property_value, list):
             property_value = json_to_array(property_value)
         if isinstance(property_value, dict):
-            property_value = property_value.get("name")
-        info.append(property_value)
+            property_value = property_value.get("name").lower()
+        if isinstance(property_value, str):
+            property_value = property_value.lower()
+        if isinstance(property_value, bool):
+            property_value = bool_to_str(drink_property, property_value)
+        if property_value is None:
+            property_value = "none"
+        info.append(property_value.lower())
     return info
 
 
-# Converts a JSON array into an array that only holds the text values.
+# Converts a JSON array into a string that only contains the text values in
+# lower case.
 def json_to_array(json_array):
-    array = []
+    array_string = ""
+
     for element in json_array:
         string = element.get("text")
         string = string.replace("[", "")
         string = string.replace("]", "")
-        array.append(string)
-    return array
+
+        if len(array_string) == 0:
+            array_string = string.lower()
+        else:
+            array_string = array_string + ", " + string.lower()
+    return array_string
+
+
+# Converts the value of a boolean to a string that holds the information, such
+# that "is_carbonated(True)" becomes "carbonated".
+def bool_to_str(drink_property, property_value):
+    string = ""
+
+    if drink_property == "isAlcoholic":
+        if property_value:
+            string = "alcoholic"
+        else:
+            string = "non-alcoholic"
+    elif drink_property == "isCarbonated":
+        if property_value:
+            string = "carbonated"
+        else:
+            string = "non-carbonated"
+    elif drink_property == "isHot":
+        if property_value:
+            string = "hot"
+        else:
+            string = "cold"
+    return string
 
 
 # Saves the database to a Pickle file.
 def save_database(database):
+    # if not os.path.exists("database.pkl"):
     pickle.dump(database, open("database.pkl", "wb"))
-
-
-# Loads the database.
-def load_database():
-    if os.path.exists("database.pkl"):
-        return pickle.load(open("database.pkl", "rb"))
 
 
 if __name__ == "__main__":
