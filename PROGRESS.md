@@ -164,6 +164,10 @@ I looked into using the Cheers script as a data set. One of the scripts I found 
 
 I debugged the code to create the key words (24241 words). There is done a check to see if the words in a natural sentence occur in the key words. If they don't, then a string is generated that indicates what functions in the sentence were not understood. 
 
-## Monday 13/05/2017
+## Monday 15/05/2017
 
 I worked on updating the knowledge base of ordered drinks once you receive information from a sentence. I am currently trying to do this with Wordnet's hypernyms, but it does not work well yet. I also rewrote my database code and it is now a Dictionary that holds: {drink name: list of drink properties}.
+
+## Tuesday 16/05/2017
+
+I finished writing the code to find the common hypernym between a word and a drink property (e.g. color, action, ingredient). I also wrote code to ask for confirmation once a sentence has been understood or misunderstood.
