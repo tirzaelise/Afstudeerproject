@@ -2,6 +2,7 @@
 
 from nltk import word_tokenize, pos_tag
 from nltk.corpus import wordnet as wn
+from nltk.corpus import wordnet_ic
 from nltk.parse.stanford import StanfordDependencyParser
 import os
 import pickle
@@ -34,6 +35,14 @@ def load_keywords():
 
     if os.path.exists("key_words.pkl"):
         return pickle.load(open("key_words.pkl", "rb"))
+
+
+def load_properties():
+    return {"drink": wn.NOUN, "color": wn.NOUN, "skill": wn.NOUN,
+            "alcoholic": wn.ADJ, "non-alcoholic": wn.ADJ, "carbonated": wn.ADJ,
+            "non-carbonated": wn.ADJ, "hot": wn.ADJ, "cold": wn.ADJ,
+            "ingredient": wn.NOUN, "taste": wn.NOUN, "occasion": wn.NOUN,
+            "tool": wn.NOUN, "action": wn.VERB}
 
 
 def parse_sentence(parser, sentence):
@@ -104,7 +113,7 @@ def correct_functions(verbs, subjects, objects, negations):
     return verbs, subjects, objects, negations
 
 
-def ask_clarification(verb, subject, s_object, negation, key_words):
+def ask_clarification(verb, subject, s_object, negation, key_words, possessive):
     """
     Checks if the found verbs, subjects and objects are in the key words. If
     they are, the list of ordered drinks is updated with the new information. If
@@ -112,11 +121,13 @@ def ask_clarification(verb, subject, s_object, negation, key_words):
     """
 
     unknown_words = check_keywords(verb, subject, s_object, key_words)
-    # if len(unknown_words) != 0:
-    #     clarification = misunderstood(unknown_words)
-    # else:
-    drink_property = find_drink_property(s_object)
-    clarification = understood(s_object, drink_property, negation)
+    if possessive:
+        drink_property = find_drink_property(s_object, "n")
+        clarification = understood(s_object, drink_property, negation)
+    else:
+        drink_property = find_drink_property(verb, "v")
+        clarification = understood(verb, drink_property, negation)
+    print clarification
     return clarification
 
 
@@ -160,48 +171,47 @@ def misunderstood(unknown_words):
     return clarification + request
 
 
-def find_drink_property(word):
+def find_drink_property(word, pos):
     """
     Finds the drink property that has the shortest distance to a common hypernym
     between a drink property and a word.
     """
 
-    properties = ["drink", "color", "skill", "alcoholic", "non-alcoholic",
-                  "carbonated", "non-carbonated", "hot", "cold", "ingredient",
-                  "taste", "occasion", "tool", "action"]
-    shortest_distance = 1000
+    highest_similarity = 0
 
     for drink_property in properties:
-        property_synsets = wn.synsets(drink_property)
-        word_synsets = wn.synsets(word)
-        property_syn, word_syn, distance = find_best_synset(property_synsets,
+        property_pos = properties.get(drink_property)
+        property_synsets = wn.synsets(drink_property, pos=property_pos)
+        word_synsets = wn.synsets(word, pos=pos)
+        property_syn, word_syn, similarity = find_best_synset(property_synsets,
                                                             word_synsets)
-        if distance < shortest_distance and word in str(word_syn):
-            shortest_distance = distance
+
+        if similarity > highest_similarity:
+            highest_similarity = similarity
             best_property = drink_property
     return best_property
 
 
 def find_best_synset(synsets_1, synsets_2):
     """
-    Uses the shortest distance to a common hypernym to find the two synsets that
-    are likely the best options for two words.
+    Uses the Wu-Palmer similarity to find the two synsets that are likely the
+    best options for two words.
     """
 
-    shortest_distance = 1000
+    highest_similarity = 0
     best_synset_1 = ""
     best_synset_2 = ""
 
     for synset_1 in synsets_1:
         for synset_2 in synsets_2:
-            current_distance = synset_1.shortest_path_distance(synset_2)
-            if current_distance is None:
-                current_distance = 1000
-            if current_distance < shortest_distance:
-                shortest_distance = current_distance
+            similarity = synset_1.wup_similarity(synset_2)
+            if similarity is None:
+                similarity = 0
+            if similarity > highest_similarity:
+                highest_similarity = similarity
                 best_synset_1 = synset_1
                 best_synset_2 = synset_2
-    return best_synset_1, best_synset_2, shortest_distance
+    return best_synset_1, best_synset_2, highest_similarity
 
 
 def understood(word, drink_property, negation):
@@ -211,22 +221,26 @@ def understood(word, drink_property, negation):
     """
 
     vowels = ("a", "e", "i", "o", "u")
+    property_pos = properties.get(drink_property)
+    start_of_sentence = "I understand you"
+    end_of_sentence = ". Is this correct?"
+    verb = " have "
+    verb_compound = " got "
+    property_as = " as a "
 
-    if negation:
-        if drink_property.startswith(vowels):
-            response = "I understand you don't have " + word + " as an " + \
-                       drink_property + ". Is this correct?"
-        else:
-            response = "I understand you don't have " + word + " as a " + \
-                       drink_property + ". Is this correct?"
-    else:
-        if drink_property.startswith(vowels):
-            response = "I understand you have " + word + " as an " + \
-                       drink_property + ". Is this correct?"
-        else:
-            response = "I understand you have " + word + " as a " + \
-                       drink_property + ". Is this correct?"
-    return response
+    if not negation:
+        negation = ""
+
+    if property_pos == wn.VERB:
+        verb = " can "
+        verb_compound = " "
+
+    if drink_property.startswith(vowels):
+        property_as = " as an "
+
+
+    return start_of_sentence + verb + negation + verb_compound + word + \
+           property_as + drink_property + end_of_sentence
 
 
 def speak(string):
@@ -243,6 +257,17 @@ def ask_confirmation():
 
     confirmed = True
     return confirmed
+
+
+def is_possessive(verb):
+    """
+    Returns a boolean that indicates whether a verb expresses possession.
+    """
+
+    possesive = ("has", "have", "possess", "own", "has got", "have got", "hold")
+
+    return any(verb in string for string in possesive)
+
 
 
 def update_drinks(database, drinks, word, negation):
@@ -271,25 +296,32 @@ def substring_in_list(substring, l_ist):
 if __name__ == "__main__":
     ordered_drinks = ["martini"]
     available_drinks = ordered_drinks
-    sentence = "I can't shake any drinks."
+    sentence = "I have got no lemons."
 
     database = load_database()
     parser = load_parser()
     key_words = load_keywords()
+    properties = load_properties()
     parsed_sentence = parse_sentence(parser, sentence)
     verbs = get_verbs(sentence)
     verbs, subjects, objects, negations = analyse_sentence(verbs,
                                                            parsed_sentence)
 
-    print verbs, subjects, objects, negations
-
-    # for i in range(0, len(verbs)):
-    #     clarification = ask_clarification(verbs[i], subjects[i], objects[i],
-    #                                       negations[i], key_words)
-    #     speak(clarification)
-    #     confirmed = ask_confirmation()
-    #     if confirmed:
-    #         update_drinks(database, available_drinks, objects[i], negations[i])
-    #     else:
-    #         speak("Please describe what you mean differently.")
-    # print available_drinks
+    for i in range(0, len(verbs)):
+        if is_possessive(verbs[i]):
+            clarification = ask_clarification(verbs[i], subjects[i], objects[i],
+                                              negations[i], key_words, True)
+        else:
+            clarification = ask_clarification(verbs[i], subjects[i], objects[i],
+                                              negations[i], key_words, False)
+        speak(clarification)
+        confirmed = ask_confirmation()
+        if confirmed:
+            if is_possessive(verbs[i]):
+                update_drinks(database, available_drinks, objects[i],
+                              negations[i])
+            else:
+                update_drinks(database, available_drinks, verbs[i], negations[i])
+        else:
+            speak("Please describe what you mean differently.")
+    print available_drinks
