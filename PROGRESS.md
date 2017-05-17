@@ -171,3 +171,7 @@ I worked on updating the knowledge base of ordered drinks once you receive infor
 ## Tuesday 16/05/2017
 
 I finished writing the code to find the common hypernym between a word and a drink property (e.g. color, action, ingredient). I also wrote code to ask for confirmation once a sentence has been understood or misunderstood.
+
+## Wednesday 17/05/2017
+
+The synsets that are generated for a word and a drink property are now constrained by the desired POS tag. This makes sure that an action is found when a verb is fed into the program instead of a noun. Furthermore, whether a verb or a noun is used is no decided based on whether there is an object in the sentence or not, but on whether the verb expresses possession: e.g. have, possess, own, have got, hold. The most relevant drink property for a word is found using Wu-Palmer similarity instead of the shortest path distance.
