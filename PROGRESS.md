@@ -175,3 +175,12 @@ I finished writing the code to find the common hypernym between a word and a dri
 ## Wednesday 17/05/2017
 
 The synsets that are generated for a word and a drink property are now constrained by the desired POS tag. This makes sure that an action is found when a verb is fed into the program instead of a noun. Furthermore, whether a verb or a noun is used is no decided based on whether there is an object in the sentence or not, but on whether the verb expresses possession: e.g. have, possess, own, have got, hold. The most relevant drink property for a word is found using Wu-Palmer similarity instead of the shortest path distance.
+
+## Thursday 18/05/2017
+
+I spent a lot of time trying to get NAOqi working on my laptop, which I was able to fix by setting LD Library Path to the C++ NAOqi folder. But because of this, it was no longer possible to connect to a NAO robot. I wanted to test if it would be possible to use the ALSpeechRecognition API for the speech recognition of a sentence, but both my Python code and Choregraphe gave the error that ALSpeechRecognition could not be found. I'm not sure how to fix this yet.
+
+Meeting points:
+- It's better to get one component working well than each component working only half well
+- SMACH (Ros)
+
