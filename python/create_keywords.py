@@ -26,7 +26,9 @@ def make_keywords():
     """
 
     key_words = ["alcoholic", "description", "carbonated", "hot", "cold",
-                 "skill", "color", "tastes", "occasions", "tools", "actions"]
+                 "skill", "color", "tastes", "occasions", "tools", "actions",
+                 "have", "has", "have got", "has got", "own", "owns", "want",
+                 "wants", "is", "are", "do", "does", "like", "likes"]
 
     for item in database:
         drink = database.get(item)
@@ -92,11 +94,13 @@ def remove_measurements(string):
 
 def clean_keywords(key_words):
     """
-    Flattens the list of key words, removes duplicates and removes None types.
+    Flattens the list of key words, removes duplicates, converts unicode types
+    to string types and removes None types.
     """
 
     flattened_list = list(flatten(key_words))
     key_words = remove_duplicates(flattened_list)
+    key_words = encode_keywords(key_words)
     return [key_word for key_word in key_words if key_word is not None]
 
 
@@ -115,6 +119,21 @@ def flatten(unflattened_list):
 def remove_duplicates(key_words):
     """ Removes the duplicates from a list. """
     return list(set(key_words))
+
+
+def encode_keywords(key_words):
+    """
+    Encodes all the unicode type key words to string types so that they
+    can be set as vocabulary for ALSpeechRecognition.
+    """
+
+    new_keywords = []
+
+    for key_word in key_words:
+        if isinstance(key_word, unicode):
+            key_word = key_word.encode("ascii", "ignore")
+        new_keywords.append(key_word)
+    return new_keywords
 
 
 def get_synonyms(key_words):

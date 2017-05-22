@@ -1,5 +1,6 @@
 # !/usr/bin/env python2
 
+from naoqi import ALProxy
 from nltk import word_tokenize, pos_tag
 from nltk.corpus import wordnet as wn
 from nltk.corpus import wordnet_ic
@@ -8,6 +9,24 @@ import os
 import pickle
 from pprint import pprint
 import time
+
+
+def setup_program(ip):
+    """
+    Sets up the program by loading the database, parser, key words and drink
+    properties and by setting up the robot.
+    """
+
+    database = load_database()
+    parser = load_parser()
+    key_words = load_keywords()
+    key_words = encode_keywords(key_words)
+    if "stop" not in key_words:
+        key_words.append("stop")
+    properties = load_properties()
+    setup_robot(ip, key_words)
+
+    return database, parser, key_words, properties
 
 
 def load_database():
@@ -37,12 +56,65 @@ def load_keywords():
         return pickle.load(open("key_words.pkl", "rb"))
 
 
+def encode_keywords(key_words):
+    """
+    Encodes all the unicode type key words to string types so that they
+    can be set as vocabulary for ALSpeechRecognition.
+    """
+
+    new_keywords = []
+
+    for key_word in key_words:
+        if isinstance(key_word, unicode):
+            key_word = key_word.encode("ascii", "ignore")
+        new_keywords.append(key_word)
+    return new_keywords
+
+
 def load_properties():
     return {"drink": wn.NOUN, "color": wn.NOUN, "skill": wn.NOUN,
             "alcoholic": wn.ADJ, "non-alcoholic": wn.ADJ, "carbonated": wn.ADJ,
             "non-carbonated": wn.ADJ, "hot": wn.ADJ, "cold": wn.ADJ,
             "ingredient": wn.NOUN, "taste": wn.NOUN, "occasion": wn.NOUN,
             "tool": wn.NOUN, "action": wn.VERB}
+
+
+def setup_robot(ip, key_words):
+    """
+    Uses the robot's IP address to create a proxy on the speech recognition
+    module. Sets the speech recognition language to English and uses the list
+    of key words as vocabulary.
+    """
+
+    global asr
+    global alm
+
+    asr = ALProxy("ALSpeechRecognition", ip, 9559)
+    asr.setLanguage("English")
+    start_time = time.time()
+    # asr.setVocabulary(key_words, True)
+    asr.setVocabulary(key_words, False)
+    print "set vocab time:", time.time() - start_time
+    asr.setVisualExpression(True)
+    asr.setAudioExpression(False)
+    alm = ALProxy("ALMemory", ip, 9559)
+
+
+def robot_listen():
+    global asr
+    global alm
+
+    asr.subscribe("test")
+
+    while True:
+        time.sleep(0.5)
+        recognized_word = alm.getData("WordRecognized")[0]
+        confidence = alm.getData("WordRecognized")[1]
+        if confidence > 0.65:
+            print recognized_word
+        if recognized_word == "stop":
+            asr.unsubscribe("test")
+            return
 
 
 def parse_sentence(parser, sentence):
@@ -243,7 +315,7 @@ def understood(word, drink_property, negation):
            property_as + drink_property + end_of_sentence
 
 
-def speak(string):
+def robot_speak(string):
     """ Makes the robot say a string. """
 
     string
@@ -288,6 +360,7 @@ def substring_in_list(substring, l_ist):
     """
 
     substring_list = [s for s in l_ist if substring in s]
+
     if len(substring_list) > 0:
         return True
     return False
@@ -298,30 +371,30 @@ if __name__ == "__main__":
     available_drinks = ordered_drinks
     sentence = "I have got no lemons."
 
-    database = load_database()
-    parser = load_parser()
-    key_words = load_keywords()
-    properties = load_properties()
-    parsed_sentence = parse_sentence(parser, sentence)
-    verbs = get_verbs(sentence)
-    verbs, subjects, objects, negations = analyse_sentence(verbs,
-                                                           parsed_sentence)
+    database, parser, key_words, properties = setup_program("10.42.0.209")
+    robot_listen()
 
-    for i in range(0, len(verbs)):
-        if is_possessive(verbs[i]):
-            clarification = ask_clarification(verbs[i], subjects[i], objects[i],
-                                              negations[i], key_words, True)
-        else:
-            clarification = ask_clarification(verbs[i], subjects[i], objects[i],
-                                              negations[i], key_words, False)
-        speak(clarification)
-        confirmed = ask_confirmation()
-        if confirmed:
-            if is_possessive(verbs[i]):
-                update_drinks(database, available_drinks, objects[i],
-                              negations[i])
-            else:
-                update_drinks(database, available_drinks, verbs[i], negations[i])
-        else:
-            speak("Please describe what you mean differently.")
-    print available_drinks
+
+    # parsed_sentence = parse_sentence(parser, sentence)
+    # verbs = get_verbs(sentence)
+    # verbs, subjects, objects, negations = analyse_sentence(verbs,
+    #                                                        parsed_sentence)
+    #
+    # for i in range(0, len(verbs)):
+    #     if is_possessive(verbs[i]):
+    #         clarification = ask_clarification(verbs[i], subjects[i], objects[i],
+    #                                           negations[i], key_words, True)
+    #     else:
+    #         clarification = ask_clarification(verbs[i], subjects[i], objects[i],
+    #                                           negations[i], key_words, False)
+    #     robot_speak(clarification)
+    #     confirmed = ask_confirmation()
+    #     if confirmed:
+    #         if is_possessive(verbs[i]):
+    #             update_drinks(database, available_drinks, objects[i],
+    #                           negations[i])
+    #         else:
+    #             update_drinks(database, available_drinks, verbs[i], negations[i])
+    #     else:
+    #         robot_speak("Please describe what you mean differently.")
+    # print available_drinks
