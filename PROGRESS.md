@@ -186,3 +186,9 @@ Meeting points:
 ## Friday 19/05/2017
 
 I spent the day working on my literature review assignment for Academic English.
+
+## Monday 22/05/2017
+
+I managed to get ALSpeechRecognition working on my laptop and the Nao, but the downside of this speech recognition is that you have to indicate a time that the robot listens for. I found an Google Speech Recognition API for a Nao on Github, but this does not work with the Nao's microphone, it uses the microphone in your laptop. I am now looking into using Watson.
+
+Great paper on speech recognition and how to use the microphones for NAOqi: <a href="https://arxiv.org/pdf/1704.04797.pdf">Setting Up Pepper For Autonomous Navigation And Personalized Interaction With Users</a>
