@@ -183,3 +183,6 @@ Meeting points:
 - It's better to get one component working well than each component working only half well
 - SMACH (Ros)
 
+## Friday 19/05/2017
+
+I spent the day working on my literature review assignment for Academic English.
