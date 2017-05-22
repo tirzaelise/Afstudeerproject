@@ -186,3 +186,11 @@ Meeting points:
 ## Friday 19/05/2017
 
 I spent the day working on my literature review assignment for Academic English.
+
+## Monday 22/05/2017
+
+I managed to get ALSpeechRecognition working on my laptop and the Nao, but the downside of this speech recognition is that you have to indicate a time that the robot listens for. I found an Google Speech Recognition API for a Nao on Github, but this does not work with the Nao's microphone, it uses the microphone in your laptop. I am now looking into using Watson.
+
+Great paper on speech recognition and how to use the microphones for NAOqi: <a href="https://arxiv.org/pdf/1704.04797.pdf">Setting Up Pepper For Autonomous Navigation And Personalized Interaction With Users</a> -> User touches the robot's hand to indicate that it wants to start speaking. The energy levels are measured for 200 ms to create a noise baseline, because the assumption is that the user does not start speaking immediately after pushing the robot's hand. This is used as a reference to know when the user has stopped speaking and is set as the silence threshold. They use a moving window of 1 second, shifting every 200 ms, to measure the average energy levels. If it is close to the initial value of the threshold, the user has stopped speaking. 
+
+I wrote code to measure the average energy level every second and use this to stop ALSpeechRecognition.
