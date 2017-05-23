@@ -28,24 +28,25 @@ def make_keywords():
     key_words = ["alcoholic", "description", "carbonated", "hot", "cold",
                  "skill", "color", "tastes", "occasions", "tools", "actions",
                  "have", "has", "have got", "has got", "own", "owns", "want",
-                 "wants", "is", "are", "do", "does", "like", "likes"]
+                 "wants", "is", "are", "do", "does", "like", "likes", "hold",
+                 "holds", "got", "possess", "possesses"]
 
     for item in database:
         drink = database.get(item)
-        split_name = split_string(drink.name)
-        split_description = split_string(drink.description)
-        ingredients = only_ingredients(drink.ingredients)
+        split_name = split_string(drink[0])
+        split_description = split_string(drink[1])
+        ingredients = only_ingredients(drink[7])
 
-        key_words.append(drink.name)
+        key_words.append(drink[0])
         key_words.append(split_name)
         key_words.append(split_description)
-        key_words.append(drink.color)
-        key_words.append(drink.skill)
+        key_words.append(drink[2])
+        key_words.append(drink[3])
         key_words.append(ingredients)
-        key_words.append(drink.tastes)
-        key_words.append(drink.occasions)
-        key_words.append(drink.tools)
-        key_words.append(drink.actions)
+        key_words.append(drink[8])
+        key_words.append(drink[9])
+        key_words.append(drink[10])
+        key_words.append(drink[11])
     return key_words
 
 
@@ -70,7 +71,7 @@ def only_ingredients(ingredients):
 
     new_ingredients = []
 
-    for ingredient in ingredients:
+    for ingredient in ingredients.split(", "):
         new_ingredient = remove_measurements(ingredient)
         new_ingredients.append(new_ingredient)
     return new_ingredients
