@@ -101,7 +101,6 @@ def clean_keywords(key_words):
 
     flattened_list = list(flatten(key_words))
     key_words = remove_duplicates(flattened_list)
-    key_words = encode_keywords(key_words)
     return [key_word for key_word in key_words if key_word is not None]
 
 
@@ -169,5 +168,6 @@ if __name__ == "__main__":
     key_words = make_keywords()
     cleaned_keywords = clean_keywords(key_words)
     final_keywords = get_synonyms(cleaned_keywords)
+    key_words = encode_keywords(key_words)
     save_keywords(final_keywords)
     print len(final_keywords)
