@@ -194,3 +194,18 @@ I managed to get ALSpeechRecognition working on my laptop and the Nao, but the d
 Great paper on speech recognition and how to use the microphones for NAOqi: <a href="https://arxiv.org/pdf/1704.04797.pdf">Setting Up Pepper For Autonomous Navigation And Personalized Interaction With Users</a> -> User touches the robot's hand to indicate that it wants to start speaking. The energy levels are measured for 200 ms to create a noise baseline, because the assumption is that the user does not start speaking immediately after pushing the robot's hand. This is used as a reference to know when the user has stopped speaking and is set as the silence threshold. They use a moving window of 1 second, shifting every 200 ms, to measure the average energy levels. If it is close to the initial value of the threshold, the user has stopped speaking. 
 
 I wrote code to measure the average energy level every second and use this to stop ALSpeechRecognition.
+
+## Tuesday 23/05/2017
+
+I wanted to use threading to measure the average energy level more often than every second. However, I have to stop the threads as soon as the average energy level gets close to the baseline (which is measured in the first thread). This means that the thread has to return the baseline value after the first thread, but measuring the average energy level takes 1 second so the next thread is not started until after 1 second instead of after 0.2 seconds. This basically took all day, until I accepted that I will just measure the average energy level every second instead of more often than that. After that, I wanted to look into using IBM Watson's Speech To Text, but I cannot connect to NAOqi and the internet at the same time from a Python process due to the following error: <i>requests.exceptions.SSLError: Can't connect to HTTPS URL because the SSL module is not available.</i>. I tried to rebuild/recompile Python, but then I got the following error (which I will have to look into tomorrow): 
+
+```
+>>> import ssl 
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/usr/local/lib/python2.7/ssl.py", line 95, in <module>
+    from collections import namedtuple
+  File "/usr/local/lib/python2.7/collections.py", line 20, in <module>
+    from _collections import deque, defaultdict
+ImportError: No module named _collections
+```
