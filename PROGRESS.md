@@ -209,3 +209,7 @@ Traceback (most recent call last):
     from _collections import deque, defaultdict
 ImportError: No module named _collections
 ```
+
+## Wednesday 24/05/2017
+
+Installing NAOqi version 2.7-2.1.2.17 fixed the error for import naoqi and import ssl. I worked on getting the sound from the Nao's microphone today and I wanted to stream this so that there is less latency between the talking and the speech recognition, but there is no option for this in the NAOqi SDK. The only option there is to save the recording to a file. I looked into getting a stream anyway, but this did not end up working. I now record an audio file, but this is saved in a temporary directory on the Nao so I have to send this to my laptop again to recognise speech. This worked, but I suspect that the name of the temporary directory changes when the Nao restarts. I will have to test this tomorrow. I also tested my code to measure the average energy level on the Pepper to make sure that it works on there as well and it does.
