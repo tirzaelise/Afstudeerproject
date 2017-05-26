@@ -6,13 +6,21 @@
 # directory is found and the audio file is copied to the computer. Then, IBM
 # Watson's speech to text API is used to transcribe the audio file.
 
-from energy_levels import level_in_baseline
-import json
+
+from google.cloud import speech
+import io
 from naoqi import ALProxy
 import os
 import subprocess
 import time
-from watson_developer_cloud import SpeechToTextV1
+
+
+def copy_audio(ip, recording_file):
+    """ Copies the recorded audio file to the computer. """
+
+    naoqi_folder = find_naoqi_folder(ip)
+    cmd = "scp nao@" + ip + ":" + naoqi_folder + "/" + recording_file + " ."
+    os.system(cmd)
 
 
 def find_naoqi_folder(ip):
@@ -35,54 +43,34 @@ def find_naoqi_folder(ip):
     return temp_folder + naoqi_folder
 
 
-def record_audio(ip, file_path):
-    """
-    Uses the built-in NAOqi function to record audio using the Nao's
-    microphones.
-    """
+def transcribe_audio(recording_file):
+    """ Transcribes the given audio file using the Google Cloud Speech API. """
 
-    aar = ALProxy("ALAudioRecorder", ip, 9559)
-    aap = ALProxy("ALAudioPlayer", ip, 9559)
+    speech_client = speech.Client()
 
-    # Sometimes the microphone is already recording.
-    aar.stopMicrophonesRecording()
+    with io.open(recording_file, "rb") as audio_file:
+        content = audio_file.read()
+        audio_sample = speech_client.sample(
+            content=content,
+            source_uri=None,
+            encoding="LINEAR16",
+            sample_rate_hertz=16000)
 
-    print "start recording"
-    aar.startMicrophonesRecording(file_path, "wav", 16000, (0, 0, 1, 0))
+    alternatives = audio_sample.recognize("en-US")
+    transcripts = ""
 
-    # Record while the energy levels are not close in range to the baseline.
-    while not level_in_baseline(ip):
-        print "listening"
-
-    aar.stopMicrophonesRecording()
-    print "stop recording"
+    for alternative in alternatives:
+        transcripts = transcripts + alternative.transcript
+    return transcripts
 
 
-def copy_audio(ip, naoqi_folder, file_path):
-    """ Copies the recorded audio file to the computer. """
-
-    cmd = "scp nao@" + ip + ":" + naoqi_folder + "/" + file_path + " ."
-    os.system(cmd)
-
-
-def transcribe_audio(file_path):
-    with open(file_path, "rb") as audio_file:
-        return json.dumps(speech_to_text.recognize(audio_file,
-                                                   content_type="audio/wav"),
-                          indent=2)
+def recognise_speech(ip, recording_file):
+    copy_audio(ip, recording_file)
+    return transcribe_audio(recording_file)
 
 
 if __name__ == "__main__":
     ip = "146.50.60.43"
-    file_path = "recording.wav"
-
-    speech_to_text = SpeechToTextV1(
-        username = "55cc7a57-301f-4f86-b38d-d3609f132000",
-        password = "dPycbcXvAYIX",
-        x_watson_learning_opt_out=False,
-        )
-
-    naoqi_folder = find_naoqi_folder(ip)
-    record_audio(ip, file_path)
-    copy_audio(ip, naoqi_folder, file_path)
-    transcribe_audio(file_path)
+    start_time = time.time()
+    print transcribe_audio("recording.wav")
+    print "total transcript time:", time.time() - start_time
