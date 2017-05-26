@@ -1,10 +1,15 @@
-# import commands
+# !/usr/bin/env python2
+
+# This file uses the Nao's microphones to record audio. The audio is saved on
+# the Nao in a temporary directory that is renamed when the Nao starts up, but
+# always starts with "naoqi" and is always located in "/var/volatile/tmp". This
+# directory is found and the audio file is copied to the computer. Then, IBM
+# Watson's speech to text API is used to transcribe the audio file.
+
 from energy_levels import level_in_baseline
 import json
 from naoqi import ALProxy
-from os.path import join, dirname
 import os
-import requests
 import subprocess
 import time
 from watson_developer_cloud import SpeechToTextV1
@@ -56,8 +61,7 @@ def record_audio(ip, file_path):
 def copy_audio(ip, naoqi_folder, file_path):
     """ Copies the recorded audio file to the computer. """
 
-    cmd = "scp nao@" + ip + ":" + naoqi_folder + "/" + file_path + \
-        " ."
+    cmd = "scp nao@" + ip + ":" + naoqi_folder + "/" + file_path + " ."
     os.system(cmd)
 
 
