@@ -1,5 +1,8 @@
 # !/usr/bin/env python2
 
+import collections
+import itertools
+from itertools import repeat
 from naoqi import ALProxy
 from nltk import word_tokenize, pos_tag
 from nltk.corpus import wordnet as wn
@@ -11,7 +14,47 @@ from pprint import pprint
 import time
 
 
-def setup_program(ip):
+def understand_sentence(sentence):
+    database, parser, key_words, properties = setup_program()
+    parsed_sentence = parse_sentence(parser, sentence)
+    verbs = get_verbs(sentence, parsed_sentence)
+    verbs, subjects, objects, negations = analyse_sentence(verbs,
+                                                           parsed_sentence)
+
+    for i in range(0, len(verbs)):
+        for j in range(0, len(verbs[i])):
+            if is_possessive(verbs[i][j]):
+                available_drinks = update_drinks(database, available_drinks,
+                                                 objects[i][j], negations[i][j])
+            else:
+                available_drinks = update_drinks(database, available_drinks,
+                                                 verbs[i][j], negations[i][j])
+
+    # for i in range(0, len(verbs)):
+    #     if is_possessive(verbs[i]):
+    #         clarification = ask_clarification(properties, verbs[i], subjects[i],
+    #                                           objects[i], negations[i],
+    #                                           key_words, True)
+    #     else:
+    #         clarification = ask_clarification(properties, verbs[i], subjects[i],
+    #                                           objects[i], negations[i],
+    #                                           key_words, False)
+    #     robot_speak(clarification)
+    #     confirmed = ask_confirmation()
+    #     if confirmed:
+    #         if is_possessive(verbs[i]):
+    #             update_drinks(database, available_drinks, objects[i],
+    #                           negations[i])
+    #         else:
+    #             update_drinks(database, available_drinks, verbs[i],
+    #                           negations[i])
+    #     else:
+    #         robot_speak("Please describe what you mean differently.")
+    # print available_drinks
+
+
+# def setup_program(ip):
+def setup_program():
     """
     Sets up the program by loading the database, parser, key words and drink
     properties and by setting up the robot.
@@ -20,11 +63,8 @@ def setup_program(ip):
     database = load_database()
     parser = load_parser()
     key_words = load_keywords()
-    key_words = encode_keywords(key_words)
-    if "stop" not in key_words:
-        key_words.append("stop")
     properties = load_properties()
-    setup_robot(ip, key_words)
+    # setup_robot(ip, key_words)
 
     return database, parser, key_words, properties
 
@@ -56,21 +96,6 @@ def load_keywords():
         return pickle.load(open("key_words.pkl", "rb"))
 
 
-def encode_keywords(key_words):
-    """
-    Encodes all the unicode type key words to string types so that they
-    can be set as vocabulary for ALSpeechRecognition.
-    """
-
-    new_keywords = []
-
-    for key_word in key_words:
-        if isinstance(key_word, unicode):
-            key_word = key_word.encode("ascii", "ignore")
-        new_keywords.append(key_word)
-    return new_keywords
-
-
 def load_properties():
     return {"drink": wn.NOUN, "color": wn.NOUN, "skill": wn.NOUN,
             "alcoholic": wn.ADJ, "non-alcoholic": wn.ADJ, "carbonated": wn.ADJ,
@@ -79,42 +104,25 @@ def load_properties():
             "tool": wn.NOUN, "action": wn.VERB}
 
 
-def setup_robot(ip, key_words):
-    """
-    Uses the robot's IP address to create a proxy on the speech recognition
-    module. Sets the speech recognition language to English and uses the list
-    of key words as vocabulary.
-    """
-
-    global asr
-    global alm
-
-    asr = ALProxy("ALSpeechRecognition", ip, 9559)
-    asr.setLanguage("English")
-    start_time = time.time()
-    # asr.setVocabulary(key_words, True)
-    asr.setVocabulary(key_words, False)
-    print "set vocab time:", time.time() - start_time
-    asr.setVisualExpression(True)
-    asr.setAudioExpression(False)
-    alm = ALProxy("ALMemory", ip, 9559)
-
-
-def robot_listen():
-    global asr
-    global alm
-
-    asr.subscribe("test")
-
-    while True:
-        time.sleep(0.5)
-        recognized_word = alm.getData("WordRecognized")[0]
-        confidence = alm.getData("WordRecognized")[1]
-        if confidence > 0.65:
-            print recognized_word
-        if recognized_word == "stop":
-            asr.unsubscribe("test")
-            return
+# def setup_robot(ip, key_words):
+#     """
+#     Uses the robot's IP address to create a proxy on the speech recognition
+#     module. Sets the speech recognition language to English and uses the list
+#     of key words as vocabulary.
+#     """
+#
+#     global asr
+#     global alm
+#
+#     asr = ALProxy("ALSpeechRecognition", ip, 9559)
+#     asr.setLanguage("English")
+#     start_time = time.time()
+#     # asr.setVocabulary(key_words, True)
+#     asr.setVocabulary(key_words, False)
+#     print "set vocab time:", time.time() - start_time
+#     asr.setVisualExpression(True)
+#     asr.setAudioExpression(False)
+#     alm = ALProxy("ALMemory", ip, 9559)
 
 
 def parse_sentence(parser, sentence):
@@ -125,7 +133,7 @@ def parse_sentence(parser, sentence):
     return list(dep.triples())
 
 
-def get_verbs(sentence):
+def get_verbs(sentence, parsed_sentence):
     """ Returns all the verbs in a sentence. """
 
     verbs = []
@@ -133,9 +141,25 @@ def get_verbs(sentence):
     tagged_sentence = pos_tag(tokenized_sentence)
 
     for word in tagged_sentence:
-        if word[1].startswith("VB"):
-            verbs.append(word[0])
+        if word[1].startswith("VB") and not \
+           is_auxiliary(parsed_sentence, word[0]):
+            verbs.append([word[0]])
     return verbs
+
+
+def is_auxiliary(parsed_sentence, verb):
+    """
+    An auxiliary of a clause is a non-main verb of the clause, e.g., a modal
+    auxiliary, or a form of 'be', 'do' or 'have' in a periphrastic tense. The
+    parser incorrectly ascribes the main verb to the auxiliary verb so there
+    is done a different check than expected, e.g. 'died' is the auxiliary verb
+    in 'has died'.
+    """
+
+    for word in parsed_sentence:
+        if word[0][0] == verb or word[2][0] == verb and word[1] != "aux":
+            return False
+    return True
 
 
 def analyse_sentence(verbs, sentence):
@@ -146,9 +170,9 @@ def analyse_sentence(verbs, sentence):
     negations = []
 
     for verb in verbs:
-        subjects.append(get_function_word(sentence, verb, "nsubj"))
-        objects.append(get_function_word(sentence, verb, "dobj"))
-        negations.append(get_function_word(sentence, verb, "neg"))
+        subjects.append(get_function_word(sentence, verb[0], "nsubj"))
+        objects.append(get_function_word(sentence, verb[0], "dobj"))
+        negations.append(get_function_word(sentence, verb[0], "neg"))
     verbs, subjects, objects, negations = correct_functions(verbs, subjects,
                                                             objects, negations)
     return verbs, subjects, objects, negations
@@ -157,35 +181,84 @@ def analyse_sentence(verbs, sentence):
 def get_function_word(sentence, verb, requested_function):
     """ Returns the word that has the requested function in a sentence. """
 
-    function_word = None
+    function_words = []
 
     for word in sentence:
         if word[1] == requested_function and word[0][0] == verb:
             if requested_function == "neg":
-                function_word = "not"
+                function_words.append("not")
             else:
-                function_word = word[2][0]
-    return function_word
+                function_words.append(word[2][0])
+                conjunctions = get_conjunctions(sentence, word[2][0])
+                if conjunctions:
+                    function_words.append(conjunctions)
+                    function_words = list(flatten(function_words))
+    if not function_words:
+        function_words.append(None)
+    return function_words
+
+
+def get_conjunctions(sentence, function_word):
+    """
+    Retrieves all the conjunctions of a word so that all the necessary
+    subjects and objects are detected.
+    """
+
+    conjunctions = []
+
+    for word in sentence:
+        if word[1] == "conj" and word[0][0] == function_word:
+            conjunctions.append(word[2][0])
+    return conjunctions
+
+
+def flatten(unflattened_list):
+    """ Flattens a list. """
+
+    for element in unflattened_list:
+        if isinstance(element, collections.Iterable) and not \
+           isinstance(element, basestring):
+            for subelement in flatten(element):
+                yield subelement
+        else:
+            yield element
 
 
 def correct_functions(verbs, subjects, objects, negations):
     """
-    Corrects sentences such that verbs that do not have a subject are omitted.
+    Corrects the found verbs, subjects, objects and negations such that they
+    can easily be used for the database by copying verbs, subjects, objects and
+    negations where necessary such that the lists are all of equal length.
     """
 
-    i = 0
+    sentences = [verbs, subjects, objects, negations]
+    maximum_length = maximum_list_length(sentences)
 
-    for subject in subjects:
-        if not subject:
-            del verbs[i]
-            del subjects[i]
-            del objects[i]
-            del negations[i]
-        i += 1
-    return verbs, subjects, objects, negations
+    for i in range(0, len(sentences)):
+        for j in range(0, len(sentences[i])):
+            if None in sentences[i][j]:
+                sentences[i][j] = [sentences[i][j-1][0]]
+                sentences[i][j].extend(repeat(sentences[i][j], \
+                                       maximum_length - len(sentences[i][j])))
+            elif len(sentences[i][j]) != maximum_length:
+                sentences[i][j].extend(repeat(sentences[i][j][0], \
+                                       maximum_length - len(sentences[i][j])))
+
+    return sentences[0], sentences[1], sentences[2], sentences[3]
 
 
-def ask_clarification(verb, subject, s_object, negation, key_words, possessive):
+def maximum_list_length(long_list):
+    maximum_length = 0
+
+    for short_list in long_list:
+        for element in short_list:
+            if isinstance(element, list) and len(element) > maximum_length:
+                maximum_length = len(element)
+    return maximum_length
+
+
+def ask_clarification(properties, verb, subject, s_object, negation, key_words,
+                      possessive):
     """
     Checks if the found verbs, subjects and objects are in the key words. If
     they are, the list of ordered drinks is updated with the new information. If
@@ -194,11 +267,12 @@ def ask_clarification(verb, subject, s_object, negation, key_words, possessive):
 
     unknown_words = check_keywords(verb, subject, s_object, key_words)
     if possessive:
-        drink_property = find_drink_property(s_object, "n")
-        clarification = understood(s_object, drink_property, negation)
+        drink_property = find_drink_property(properties, s_object, "n")
+        clarification = understood(properties, s_object, drink_property,
+                                   negation)
     else:
-        drink_property = find_drink_property(verb, "v")
-        clarification = understood(verb, drink_property, negation)
+        drink_property = find_drink_property(properties, verb, "v")
+        clarification = understood(properties, verb, drink_property, negation)
     print clarification
     return clarification
 
@@ -243,7 +317,7 @@ def misunderstood(unknown_words):
     return clarification + request
 
 
-def find_drink_property(word, pos):
+def find_drink_property(properties, word, pos):
     """
     Finds the drink property that has the shortest distance to a common hypernym
     between a drink property and a word.
@@ -286,7 +360,7 @@ def find_best_synset(synsets_1, synsets_2):
     return best_synset_1, best_synset_2, highest_similarity
 
 
-def understood(word, drink_property, negation):
+def understood(properties, word, drink_property, negation):
     """
     Uses the most similar drink property to generate a response to the natural
     sentence that was spoken.
@@ -369,32 +443,8 @@ def substring_in_list(substring, l_ist):
 if __name__ == "__main__":
     ordered_drinks = ["martini"]
     available_drinks = ordered_drinks
-    sentence = "I have got no lemons."
+    sentence = "I can stir and shake drinks."
 
-    database, parser, key_words, properties = setup_program("10.42.0.209")
-    robot_listen()
-
-
-    # parsed_sentence = parse_sentence(parser, sentence)
-    # verbs = get_verbs(sentence)
-    # verbs, subjects, objects, negations = analyse_sentence(verbs,
-    #                                                        parsed_sentence)
-    #
-    # for i in range(0, len(verbs)):
-    #     if is_possessive(verbs[i]):
-    #         clarification = ask_clarification(verbs[i], subjects[i], objects[i],
-    #                                           negations[i], key_words, True)
-    #     else:
-    #         clarification = ask_clarification(verbs[i], subjects[i], objects[i],
-    #                                           negations[i], key_words, False)
-    #     robot_speak(clarification)
-    #     confirmed = ask_confirmation()
-    #     if confirmed:
-    #         if is_possessive(verbs[i]):
-    #             update_drinks(database, available_drinks, objects[i],
-    #                           negations[i])
-    #         else:
-    #             update_drinks(database, available_drinks, verbs[i], negations[i])
-    #     else:
-    #         robot_speak("Please describe what you mean differently.")
-    # print available_drinks
+    start_time = time.time()
+    understand_sentence(sentence)
+    print "Time:", time.time() - start_time
