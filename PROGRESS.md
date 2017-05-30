@@ -221,3 +221,8 @@ I finally figured out how to find the temporary directory where the audio record
 ## Monday 29/05/2017
 
 The parser needs commas in order to detect conjunctions. The sentence "I don't have any vodka, gin or peaches" is parsed incorrectly if the comma is absent, since vodka and gin are then parsed as a compound. Also read through the <a href="https://nlp.stanford.edu/software/dependencies_manual.pdf">Stanford Dependencies manual</a> to check if there are any more of such abbreviations that could be important, but I did not find any. Edited the natural language understanding code to only add a verb to the list of verbs if it is not auxiliary so that I can copy the verbs that don't have a subject/object due to the fact that they are conjuncts. Also eidted the natural language understanding code to copy the subjects/objects/verbs/negations x amount of times if necessary to update the database more easily.
+
+## Tuesday 30/05/2017 
+
+I changed the code to understand natural language so that it is a class. This way, I can use \_\_init\_\_ so that I only have to load in the parser, database, key words and properties once, making the code a little faster. I also wrote code to generate the properties of the drinks that were ordered. This is used to fastly check what drinks are available since it is a dictionary of the following format: {drink name: {drink property1: property value1, drink property2: {synonym of
+drink property value2: property value2}}}.
