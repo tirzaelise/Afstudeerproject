@@ -18,11 +18,9 @@ def generate_keywords(drinks, output_file):
     dictionary = PyDictionary()
     database = load_database()
     key_words = make_keywords(database, drinks)
-    # cleaned_keywords = clean_keywords(key_words)
-    # final_keywords = get_synonyms(cleaned_keywords)
-    # key_words = encode_keywords(key_words)
-    # save_keywords(final_keywords, output_file)
-    # print len(final_keywords)
+    cleaned_keywords = clean_keywords(key_words)
+    save_keywords(cleaned_keywords, output_file)
+    print "Size of key words:", len(final_keywords)
 
 
 def load_database():
@@ -196,12 +194,4 @@ def save_keywords(key_words, output_file):
 
 
 if __name__ == "__main__":
-    # database = load_database()
-    # key_words = make_keywords()
-    # cleaned_keywords = clean_keywords(key_words)
-    # final_keywords = get_synonyms(cleaned_keywords)
-    # key_words = encode_keywords(key_words)
-    # save_keywords(final_keywords)
-    # print len(final_keywords)
-
     generate_keywords(["martini"], "output.pkl")
