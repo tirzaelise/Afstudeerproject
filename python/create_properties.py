@@ -1,26 +1,27 @@
+# !/usr/bin/env python2
+
 # This file creates the list of key words using the database that was created
 # from the Absolut Drinks Database. All the information that is in the database
 # is added to a list and this list is cleaned by flattening it and removing
 # duplicates.
 
-# !/usr/bin/env python2
 
-import collections
 import os
 import pickle
-from pprint import pprint
 from PyDictionary import PyDictionary
 
 
-def generate_keywords(drinks, output_file):
+def generate_keywords(drinks):
+    """ Generates the key words of a list of drinks. """
+
     global dictionary
 
     dictionary = PyDictionary()
     database = load_database()
     key_words = make_keywords(database, drinks)
-    cleaned_keywords = clean_keywords(key_words)
-    save_keywords(cleaned_keywords, output_file)
-    print "Size of key words:", len(final_keywords)
+    # return encode_keywords(key_words)
+    key_words = encode_keywords(key_words)
+    save_keywords(key_words, "ordered_keywords.pkl")
 
 
 def load_database():
@@ -42,27 +43,26 @@ def make_keywords(database, drinks):
 
     for item in drinks:
         property_dict = {}
-        name, colour, skill_level, alcoholic, carbonated, hot, ingredients, \
+        name, color, skill_level, alcoholic, carbonated, hot, ingredients, \
             tastes, occasions, tools, actions = get_properties(item, database)
 
         ingredients = only_ingredients(ingredients)
         tastes, occasions, tools, actions = split_lists(tastes, occasions,
                                                         tools, actions)
 
-        update_dictionary(property_dict, ingredients)
-        update_dictionary(property_dict, tastes)
-        update_dictionary(property_dict, occasions)
-        update_dictionary(property_dict, tools)
-        update_dictionary(property_dict, actions)
+        update_dictionary(property_dict, "ingredient", ingredients)
+        update_dictionary(property_dict, "taste", tastes)
+        update_dictionary(property_dict, "occasion", occasions)
+        update_dictionary(property_dict, "tool", tools)
+        update_dictionary(property_dict, "action", actions)
 
-        property_dict.update({colour: colour})
-        property_dict.update({skill_level: skill_level})
-        property_dict.update({alcoholic: alcoholic})
-        property_dict.update({carbonated: carbonated})
-        property_dict.update({hot: hot})
+        property_dict.update({"color": color})
+        property_dict.update({"skill": skill_level})
+        property_dict.update({"alcoholic": alcoholic})
+        property_dict.update({"carbonation": carbonated})
+        property_dict.update({"temperature": hot})
 
         key_words.update({name: property_dict})
-        print len(property_dict)
     return key_words
 
 
@@ -137,22 +137,25 @@ def clean_occasions(occasions):
     return new_occasions
 
 
-def update_dictionary(dictionary, word):
+def update_dictionary(dictionary, key, value):
     """ Updates the dictionary with the same key and value. """
 
-    if isinstance(word, list):
-        for element in word:
+    one_property_dict = {}
+
+    if isinstance(value, list):
+        for element in value:
             if isinstance(element, list):
-                dictionary.update({" ".join(element): " ".join(element)})
+                one_property_dict.update({" ".join(element): " ".join(element)})
                 for smaller_element in element:
-                    dictionary.update({smaller_element: smaller_element})
-                    generate_synonyms(dictionary, smaller_element)
+                    one_property_dict.update({smaller_element: smaller_element})
+                    generate_synonyms(one_property_dict, smaller_element)
             else:
-                dictionary.update({element: element})
-                generate_synonyms(dictionary, element)
+                one_property_dict.update({element: element})
+                generate_synonyms(one_property_dict, element)
     else:
-        dictionary.update({word: word})
-        generate_synonyms(dictionary, word)
+        one_property_dict.update({value: value})
+        generate_synonyms(one_property_dict, value)
+    dictionary.update({key: one_property_dict})
 
 
 def generate_synonyms(dict_to_update, word):
@@ -194,4 +197,4 @@ def save_keywords(key_words, output_file):
 
 
 if __name__ == "__main__":
-    generate_keywords(["martini"], "output.pkl")
+    generate_keywords(["martini", "margarita", "bloody mary"])
