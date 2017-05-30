@@ -2,8 +2,11 @@
 
 # This file creates the list of key words using the database that was created
 # from the Absolut Drinks Database. All the information that is in the database
-# is added to a list and this list is cleaned by flattening it and removing
-# duplicates.
+# is added to a dictionary of dictionaries and synonyms are generated of
+# the drink's temperature, carbonation, alcohol level, ingredients, tastes,
+# occasions, tools and actions. This dictionary is of the following format:
+# {drink name: {drink property1: property value1, drink property2: {synonym of
+# drink property value2: property value2}}}
 
 
 import os
@@ -197,4 +200,4 @@ def save_keywords(key_words, output_file):
 
 
 if __name__ == "__main__":
-    generate_keywords(["martini", "margarita", "bloody mary"])
+    generate_keywords(["martini", "margarita"])
