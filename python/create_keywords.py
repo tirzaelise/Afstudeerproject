@@ -11,6 +11,16 @@ import pickle
 from PyDictionary import PyDictionary
 
 
+def generate_keywords(drinks, output_file):
+    database = load_database()
+    key_words = make_keywords(database, drinks)
+    cleaned_keywords = clean_keywords(key_words)
+    final_keywords = get_synonyms(cleaned_keywords)
+    key_words = encode_keywords(key_words)
+    save_keywords(final_keywords, output_file)
+    print len(final_keywords)
+
+
 def load_database():
     """ Loads the database. """
 
@@ -18,7 +28,7 @@ def load_database():
         return pickle.load(open("database.pkl", "rb"))
 
 
-def make_keywords():
+def make_keywords(database, drinks):
     """
     Creates the list of key words using drinks database using their name,
     description, color, required skill level, ingredients, tastes, occasions,
@@ -31,7 +41,7 @@ def make_keywords():
                  "wants", "is", "are", "do", "does", "like", "likes", "hold",
                  "holds", "got", "possess", "possesses"]
 
-    for item in database:
+    for item in drinks:
         drink = database.get(item)
         split_name = split_string(drink[0])
         split_description = split_string(drink[1])
@@ -121,21 +131,6 @@ def remove_duplicates(key_words):
     return list(set(key_words))
 
 
-def encode_keywords(key_words):
-    """
-    Encodes all the unicode type key words to string types so that they
-    can be set as vocabulary for ALSpeechRecognition.
-    """
-
-    new_keywords = []
-
-    for key_word in key_words:
-        if isinstance(key_word, unicode):
-            key_word = key_word.encode("ascii", "ignore")
-        new_keywords.append(key_word)
-    return new_keywords
-
-
 def get_synonyms(key_words):
     """
     Returns all the synonyms of the key words and saves them in a list, including
@@ -157,10 +152,25 @@ def get_synonyms(key_words):
     return final_keywords
 
 
-def save_keywords(key_words):
+def encode_keywords(key_words):
+    """
+    Encodes all the unicode type key words to string types so that they
+    can be set as vocabulary for ALSpeechRecognition.
+    """
+
+    new_keywords = []
+
+    for key_word in key_words:
+        if isinstance(key_word, unicode):
+            key_word = key_word.encode("ascii", "ignore")
+        new_keywords.append(key_word)
+    return new_keywords
+
+
+def save_keywords(key_words, output_file):
     """ Saves the key words in a Pickle file. """
 
-    pickle.dump(key_words, open("key_words.pkl", "wb"))
+    pickle.dump(key_words, open(output_file, "wb"))
 
 
 if __name__ == "__main__":
