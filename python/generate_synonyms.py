@@ -12,20 +12,16 @@
 from nltk.corpus import wordnet as wn
 import os
 import pickle
-from PyDictionary import PyDictionary
 
 
 def generate_keywords(drinks):
     """ Generates the key words of a list of drinks. """
 
-    global dictionary
-
-    dictionary = PyDictionary()
     database = load_database()
     properties = load_properties()
     key_words = make_keywords(database, drinks, properties)
     # return make_keywords(database, drinks)
-    save_keywords(key_words, "ordered_keywords.pkl")
+    save_keywords(key_words, "synonyms.pkl")
 
 
 def load_database():
@@ -63,7 +59,7 @@ def make_keywords(database, drinks, properties):
         property_dict.update({"color": color})
         property_dict.update({"skill": skill_level})
         property_dict.update({"alcoholic": alcoholic})
-        property_dict.update({"carbonation": carbonated})
+        property_dict.update({"carbonated": carbonated})
         property_dict.update({"temperature": hot})
 
         key_words.update({name: property_dict})
