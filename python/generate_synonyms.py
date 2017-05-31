@@ -12,6 +12,7 @@
 from nltk.corpus import wordnet as wn
 import os
 import pickle
+from pprint import pprint
 
 
 def generate_keywords(drinks):
@@ -42,7 +43,6 @@ def make_keywords(database, drinks, properties):
     key_words = {}
 
     for item in drinks:
-        property_dict = {}
         name, color, skill_level, alcoholic, carbonated, hot, ingredients, \
             tastes, occasions, tools, actions = get_properties(item, database)
 
@@ -50,19 +50,19 @@ def make_keywords(database, drinks, properties):
         tastes, occasions, tools, actions = split_lists(tastes, occasions,
                                                         tools, actions)
 
-        update_dictionary(property_dict, "ingredient", ingredients, properties)
-        update_dictionary(property_dict, "taste", tastes, properties)
-        update_dictionary(property_dict, "occasion", occasions, properties)
-        update_dictionary(property_dict, "tool", tools, properties)
-        update_dictionary(property_dict, "action", actions, properties)
+        update_dictionary(key_words, "ingredient", ingredients, properties)
+        update_dictionary(key_words, "taste", tastes, properties)
+        update_dictionary(key_words, "occasion", occasions, properties)
+        update_dictionary(key_words, "tool", tools, properties)
+        update_dictionary(key_words, "action", actions, properties)
 
-        property_dict.update({"color": color})
-        property_dict.update({"skill": skill_level})
-        property_dict.update({"alcoholic": alcoholic})
-        property_dict.update({"carbonated": carbonated})
-        property_dict.update({"temperature": hot})
+        key_words.update({"color": color})
+        key_words.update({"skill": skill_level})
+        key_words.update({"alcoholic": alcoholic})
+        key_words.update({"carbonated": carbonated})
+        key_words.update({"temperature": hot})
 
-        key_words.update({name: property_dict})
+        key_words.update({name: key_words})
     return key_words
 
 
@@ -140,23 +140,20 @@ def clean_occasions(occasions):
 def update_dictionary(dictionary, key, value, properties):
     """ Updates the dictionary with the same key and value. """
 
-    one_property_dict = {}
-
     if isinstance(value, list):
         for element in value:
             if isinstance(element, list):
-                one_property_dict.update({" ".join(element): " ".join(element)})
+                dictionary.update({" ".join(element): " ".join(element)})
                 for smaller_element in element:
-                    one_property_dict.update({smaller_element: smaller_element})
-                    generate_synonyms(one_property_dict, key, smaller_element,
+                    dictionary.update({smaller_element: smaller_element})
+                    generate_synonyms(dictionary, key, smaller_element,
                                       properties)
             else:
-                one_property_dict.update({element: element})
-                generate_synonyms(one_property_dict, key, element, properties)
+                dictionary.update({element: element})
+                generate_synonyms(dictionary, key, element, properties)
     else:
-        one_property_dict.update({value: value})
-        generate_synonyms(one_property_dict, key, value, properties)
-    dictionary.update({key: one_property_dict})
+        dictionary.update({value: value})
+        generate_synonyms(dictionary, key, value, properties)
 
 
 def generate_synonyms(dict_to_update, key, word, properties):
