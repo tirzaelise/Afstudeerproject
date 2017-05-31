@@ -226,3 +226,7 @@ The parser needs commas in order to detect conjunctions. The sentence "I don't h
 
 I changed the code to understand natural language so that it is a class. This way, I can use \_\_init\_\_ so that I only have to load in the parser, database, key words and properties once, making the code a little faster. I also wrote code to generate the properties of the drinks that were ordered. This is used to fastly check what drinks are available since it is a dictionary of the following format: {drink name: {drink property1: property value1, drink property2: {synonym of
 drink property value2: property value2}}}.
+
+## Wednesday 31/05/2017 
+
+I changed the code to generate synonyms using Wordnet instead of PyDictionary, because the synonyms are more relevant and you can constrain them with a pos tag. I also changed the dict of key words, it is now an easier format and simply holds all a synonyms as key and the known word as value so that it is easy to retrieve the known word. I also wrote code to update the available drinks using a list of all the drink properties so that properties can be flagged True or False. I also worked a lot on my midterm progress presentation.
