@@ -9,6 +9,7 @@
 # drink property value2: property value2}}}
 
 
+from nltk.corpus import wordnet as wn
 import os
 import pickle
 from PyDictionary import PyDictionary
@@ -21,9 +22,9 @@ def generate_keywords(drinks):
 
     dictionary = PyDictionary()
     database = load_database()
-    key_words = make_keywords(database, drinks)
-    # return encode_keywords(key_words)
-    key_words = encode_keywords(key_words)
+    properties = load_properties()
+    key_words = make_keywords(database, drinks, properties)
+    # return make_keywords(database, drinks)
     save_keywords(key_words, "ordered_keywords.pkl")
 
 
@@ -34,7 +35,7 @@ def load_database():
         return pickle.load(open("database.pkl", "rb"))
 
 
-def make_keywords(database, drinks):
+def make_keywords(database, drinks, properties):
     """
     Creates a dictionary of key words using the drinks database using the name,
     colour, required skill level, whether it's alcoholic, whether it's
@@ -53,11 +54,11 @@ def make_keywords(database, drinks):
         tastes, occasions, tools, actions = split_lists(tastes, occasions,
                                                         tools, actions)
 
-        update_dictionary(property_dict, "ingredient", ingredients)
-        update_dictionary(property_dict, "taste", tastes)
-        update_dictionary(property_dict, "occasion", occasions)
-        update_dictionary(property_dict, "tool", tools)
-        update_dictionary(property_dict, "action", actions)
+        update_dictionary(property_dict, "ingredient", ingredients, properties)
+        update_dictionary(property_dict, "taste", tastes, properties)
+        update_dictionary(property_dict, "occasion", occasions, properties)
+        update_dictionary(property_dict, "tool", tools, properties)
+        update_dictionary(property_dict, "action", actions, properties)
 
         property_dict.update({"color": color})
         property_dict.update({"skill": skill_level})
@@ -140,7 +141,7 @@ def clean_occasions(occasions):
     return new_occasions
 
 
-def update_dictionary(dictionary, key, value):
+def update_dictionary(dictionary, key, value, properties):
     """ Updates the dictionary with the same key and value. """
 
     one_property_dict = {}
@@ -151,46 +152,48 @@ def update_dictionary(dictionary, key, value):
                 one_property_dict.update({" ".join(element): " ".join(element)})
                 for smaller_element in element:
                     one_property_dict.update({smaller_element: smaller_element})
-                    generate_synonyms(one_property_dict, smaller_element)
+                    generate_synonyms(one_property_dict, key, smaller_element,
+                                      properties)
             else:
                 one_property_dict.update({element: element})
-                generate_synonyms(one_property_dict, element)
+                generate_synonyms(one_property_dict, key, element, properties)
     else:
         one_property_dict.update({value: value})
-        generate_synonyms(one_property_dict, value)
+        generate_synonyms(one_property_dict, key, value, properties)
     dictionary.update({key: one_property_dict})
 
 
-def generate_synonyms(dict_to_update, word):
+def generate_synonyms(dict_to_update, key, word, properties):
     """
     Generates the synonyms of a word and appends it to the dictionary of key
     words using itself as a key and the word the synonym was generated from as
     value.
     """
 
-    global dictionary
+    pos = properties.get(key)
 
     word = word.encode("utf-8").lower()
-    synonyms = dictionary.synonym(word)
+    if wn.morphy(word):
+        word = wn.morphy(word)
+    synsets = wn.synsets(word, pos=pos)
 
-    if synonyms:
-        for synonym in synonyms:
-            dict_to_update.update({synonym: word})
+    if synsets:
+        for synset in synsets:
+            for lemma in synset.lemma_names():
+                lemma = lemma.replace("_", " ")
+                dict_to_update.update({lemma: word})
 
 
-def encode_keywords(key_words):
+def load_properties():
     """
-    Encodes all the unicode type key words to string types so that they
-    can be set as vocabulary for ALSpeechRecognition.
+    Returns a dict that holds a property as key and the desired part of speech
+    of the property as a value.
     """
 
-    new_keywords = []
-
-    for key_word in key_words:
-        if isinstance(key_word, unicode):
-            key_word = key_word.encode("ascii", "ignore")
-        new_keywords.append(key_word)
-    return new_keywords
+    return {"color": wn.NOUN, "skill": wn.NOUN, "alcoholic": wn.ADJ,
+            "carbonation": wn.ADJ,  "temperature": wn.ADJ,
+            "ingredient": wn.NOUN, "taste": wn.NOUN, "occasion": wn.NOUN,
+            "tool": wn.NOUN, "action": wn.VERB}
 
 
 def save_keywords(key_words, output_file):
