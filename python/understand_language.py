@@ -8,8 +8,6 @@
 import collections
 import itertools
 from itertools import repeat
-from generate_property_list import generate_property_list
-from generate_synonyms import generate_keywords
 from naoqi import ALProxy
 from nltk import word_tokenize, pos_tag
 from nltk.corpus import wordnet as wn
@@ -24,7 +22,7 @@ import time
 class Understand(object):
 
     def __init__(self):
-        self.ordered_drinks = ["margarita", "martini"]
+        self.ordered_drinks = ["margarita", "martini", "bloody mary"]
         self.available_drinks = self.ordered_drinks
         self.setup_program()
 
@@ -43,7 +41,7 @@ class Understand(object):
                 else:
                     word = verbs[i][j]
                     pos = "v"
-                drink_property = self.find_drink_property(word, pos)
+                # drink_property = self.find_drink_property(word, pos)
                 self.update_drinks(word, negations[i][j])
         print self.available_drinks
 
@@ -77,13 +75,12 @@ class Understand(object):
         drink properties and by setting up the robot.
         """
 
+        start_time = time.time()
         self.load_database()
         self.load_parser()
-        # self.synonyms = generate_keywords(self.ordered_drinks)
-        self.load_synonyms()
+        self.load_synonyms(self.ordered_drinks)
+        self.load_pos_tags()
         self.load_properties()
-        self.load_property_list()
-        # self.property_list = generate_property_list(self.ordered_drinks)
 
 
     def load_database(self):
@@ -103,28 +100,42 @@ class Understand(object):
                                                path_to_models_jar=models_path)
 
 
-    def load_synonyms(self):
+    def load_synonyms(self, drinks):
         """
         Loads the key words that will be checked for occurrences of words in a
         natural sentence.
         """
 
-        if os.path.exists("synonyms.pkl"):
-            self.synonyms = pickle.load(open("synonyms.pkl", "rb"))
+        self.synonyms = {}
+
+        if os.path.exists("drinks_synonyms.pkl"):
+            all_synonyms = pickle.load(open("drinks_synonyms.pkl", "rb"))
+
+        for drink in drinks:
+            self.synonyms.update(all_synonyms.get(drink))
+
+
+    def load_pos_tags(self):
+        """ Loads the POS tags of the properties. """
+
+        self.pos_tags = {"drink": wn.NOUN, "color": wn.NOUN, "skill": wn.NOUN,
+                         "alcoholic": wn.ADJ, "non-alcoholic": wn.ADJ,
+                         "carbonated": wn.ADJ, "non-carbonated": wn.ADJ,
+                         "hot": wn.ADJ, "cold": wn.ADJ, "ingredient": wn.NOUN,
+                         "taste": wn.NOUN, "occasion": wn.NOUN,
+                         "tool": wn.NOUN, "action": wn.VERB}
 
 
     def load_properties(self):
-        self.properties = {"drink": wn.NOUN, "color": wn.NOUN, "skill": wn.NOUN,
-                           "alcoholic": wn.ADJ, "non-alcoholic": wn.ADJ,
-                           "carbonated": wn.ADJ, "non-carbonated": wn.ADJ,
-                           "hot": wn.ADJ, "cold": wn.ADJ, "ingredient": wn.NOUN,
-                           "taste": wn.NOUN, "occasion": wn.NOUN,
-                           "tool": wn.NOUN, "action": wn.VERB}
+        """ Loads the lists of properties of the ordered drinks. """
 
+        self.properties = []
 
-    def load_property_list(self):
-        if os.path.exists("property_list.pkl"):
-            self.property_list = pickle.load(open("property_list.pkl", "rb"))
+        if os.path.exists("drinks_properties.pkl"):
+            all_properties = pickle.load(open("drinks_properties.pkl", "rb"))
+
+        for drink in self.ordered_drinks:
+            self.properties.append(all_properties.get(drink))
 
 
     # def setup_robot(ip, key_words):
@@ -285,47 +296,47 @@ class Understand(object):
         return maximum_length
 
 
-    def find_drink_property(self, word, pos):
-        """
-        Finds the drink property that has the shortest distance to a common
-        hypernym between a drink property and a word.
-        """
-
-        highest_similarity = 0
-
-        for drink_property in self.properties:
-            property_pos = self.properties.get(drink_property)
-            property_synsets = wn.synsets(drink_property, pos=property_pos)
-            word_synsets = wn.synsets(word, pos=pos)
-            property_syn, word_syn, simil = \
-                self.find_best_synset(property_synsets, word_synsets)
-
-            if simil > highest_similarity:
-                highest_similarity = simil
-                best_property = drink_property
-        return best_property
-
-
-    def find_best_synset(self, synsets_1, synsets_2):
-        """
-        Uses the Wu-Palmer similarity to find the two synsets that are likely
-        the best options for two words.
-        """
-
-        highest_similarity = 0
-        best_synset_1 = ""
-        best_synset_2 = ""
-
-        for synset_1 in synsets_1:
-            for synset_2 in synsets_2:
-                similarity = synset_1.wup_similarity(synset_2)
-                if similarity is None:
-                    similarity = 0
-                if similarity > highest_similarity:
-                    highest_similarity = similarity
-                    best_synset_1 = synset_1
-                    best_synset_2 = synset_2
-        return best_synset_1, best_synset_2, highest_similarity
+    # def find_drink_property(self, word, pos):
+    #     """
+    #     Finds the drink property that has the shortest distance to a common
+    #     hypernym between a drink property and a word.
+    #     """
+    #
+    #     highest_similarity = 0
+    #
+    #     for drink_property in self.pos_tags:
+    #         property_pos = self.pos_tags.get(drink_property)
+    #         property_synsets = wn.synsets(drink_property, pos=property_pos)
+    #         word_synsets = wn.synsets(word, pos=pos)
+    #         property_syn, word_syn, simil = \
+    #             self.find_best_synset(property_synsets, word_synsets)
+    #
+    #         if simil > highest_similarity:
+    #             highest_similarity = simil
+    #             best_property = drink_property
+    #     return best_property
+    #
+    #
+    # def find_best_synset(self, synsets_1, synsets_2):
+    #     """
+    #     Uses the Wu-Palmer similarity to find the two synsets that are likely
+    #     the best options for two words.
+    #     """
+    #
+    #     highest_similarity = 0
+    #     best_synset_1 = ""
+    #     best_synset_2 = ""
+    #
+    #     for synset_1 in synsets_1:
+    #         for synset_2 in synsets_2:
+    #             similarity = synset_1.wup_similarity(synset_2)
+    #             if similarity is None:
+    #                 similarity = 0
+    #             if similarity > highest_similarity:
+    #                 highest_similarity = similarity
+    #                 best_synset_1 = synset_1
+    #                 best_synset_2 = synset_2
+    #     return best_synset_1, best_synset_2, highest_similarity
 
 
     def is_possessive(self, verb):
@@ -346,35 +357,49 @@ class Understand(object):
         words.
         """
 
-        found_keys = list(self.get_dict_keys(word, self.synonyms))
+        if wn.morphy(word):
+            word = wn.morphy(word)
 
-        for found_key in found_keys:
-            for drink_list in self.property_list:
-                if self.substring_in_list(found_key, drink_list):
-                    self.update_availability(drink_list, found_key, negation)
-        print self.property_list
+        found_key = self.synonyms.get(word)
+
+        if found_key:
+            for drink_properties in self.properties:
+                if self.substring_in_list(found_key, drink_properties):
+                    self.update_availability(drink_properties, found_key,
+                                             negation)
+        # else:
+        # Robot did not understand
 
 
-    def update_availability(self, drink_list, word, negation):
-        """ Updates the availability of a property value to False or True. """
 
-        iterate_properties = iter(drink_list)
+    def update_availability(self, drink_properties, word, negation):
+        """
+        Updates the availability of a property value to False or True and
+        removes the drink from the list of available drinks if the property
+        value is False.
+        """
+
+        iterate_properties = iter(drink_properties)
         # Skip the first loop because it's the drink's name.
         next(iterate_properties)
 
-        property_list_index =  self.property_list.index(drink_list)
+        drink_property_index =  self.properties.index(drink_properties)
 
         for element in iterate_properties:
             if word in element:
-                drink_list_index = drink_list.index(element)
+                property_index = drink_properties.index(element)
                 split_property = element.split(":")
                 if negation:
                     split_property[-1] = ": False"
+                    drink = drink_properties[0].split(": ")[0]
+                    self.available_drinks.remove(drink)
+                    del self.properties[drink_property_index]
+                    self.load_synonyms(self.available_drinks)
                 else:
                     split_property[-1] = ": True"
                 element = "".join(split_property)
-                drink_list[drink_list_index] = element
-        self.property_list[property_list_index] = drink_list
+                drink_properties[property_index] = element
+        self.properties[drink_property_index] = drink_properties
 
 
     def get_dict_keys(self, key, var):
@@ -406,4 +431,4 @@ class Understand(object):
 
 if __name__ == "__main__":
     understand = Understand()
-    understand.understand_sentence("I can stir and shake drinks.")
+    understand.understand_sentence("I don't have any lemons.")
