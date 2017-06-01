@@ -2,7 +2,7 @@
 
 # This file uses a sentence to try to update the list of drinks that were
 # ordered in order to find out what drinks are available. This is done by taking
-# the verb, subject, object and negation of a sentence (if available).
+# the verb, object and negation of a sentence (if available).
 
 
 import collections
@@ -30,8 +30,8 @@ class Understand(object):
     def understand_sentence(self, sentence):
         parsed_sentence = self.parse_sentence(sentence)
         verbs = self.get_verbs(sentence, parsed_sentence)
-        verbs, subjects, objects, negations = \
-            self.analyse_sentence(verbs, parsed_sentence)
+        verbs, objects, negations = self.analyse_sentence(verbs,
+                                                          parsed_sentence)
 
         for i in range(0, len(verbs)):
             for j in range(0, len(verbs[i])):
@@ -43,29 +43,8 @@ class Understand(object):
                     pos = "v"
                 # drink_property = self.find_drink_property(word, pos)
                 self.update_drinks(word, negations[i][j])
-        print self.available_drinks
 
-        # for i in range(0, len(verbs)):
-        #     if is_possessive(verbs[i]):
-        #         clarification = ask_clarification(properties, verbs[i], subjects[i],
-        #                                           objects[i], negations[i],
-        #                                           key_words, True)
-        #     else:
-        #         clarification = ask_clarification(properties, verbs[i], subjects[i],
-        #                                           objects[i], negations[i],
-        #                                           key_words, False)
-        #     robot_speak(clarification)
-        #     confirmed = ask_confirmation()
-        #     if confirmed:
-        #         if is_possessive(verbs[i]):
-        #             update_drinks(database, available_drinks, objects[i],
-        #                           negations[i])
-        #         else:
-        #             update_drinks(database, available_drinks, verbs[i],
-        #                           negations[i])
-        #     else:
-        #         robot_speak("Please describe what you mean differently.")
-        # print available_drinks
+        print self.available_drinks
 
 
     # def setup_program(ip):
@@ -197,21 +176,32 @@ class Understand(object):
 
 
     def analyse_sentence(self, verbs, sentence):
-        """ Analyses a sentence: returns the subject, verb and object. """
+        """ Analyses a sentence: returns the verb, object and negation. """
 
-        subjects = []
         objects = []
         negations = []
 
-        for verb in verbs:
-            subjects.append(self.get_function_word(sentence, verb[0], "nsubj"))
-            objects.append(self.get_function_word(sentence, verb[0], "dobj"))
-            negations.append(self.get_function_word(sentence, verb[0], "neg"))
-        verbs, subjects, objects, negations = self.correct_functions(verbs,
-                                                                     subjects,
-                                                                     objects,
-                                                                     negations)
-        return verbs, subjects, objects, negations
+        sentences = self.check_coordination(sentence)
+
+        for i in range(0, len(sentences)):
+            objects.append(self.get_function_word(sentences[i], verbs[i][0],
+                                                  "dobj"))
+            negations.append(self.get_function_word(sentences[i], verbs[i][0],
+                                                    "neg"))
+        verbs, objects, negations = self.correct_functions(verbs, objects,
+                                                           negations)
+        return verbs, objects, negations
+
+
+    def check_coordination(self, sentence):
+        """ Checks for a coordination and splits the sentence. """
+
+        contradiction = ("but", "however")
+
+        for i in range(0, len(sentence)):
+            if sentence[i][1] == "cc" and sentence[i][2][0] in contradiction:
+                return [sentence[0:i], sentence[i:len(sentence)+1]]
+        return [sentence]
 
 
     def get_function_word(self, sentence, verb, requested_function):
@@ -237,7 +227,7 @@ class Understand(object):
     def get_conjunctions(self, sentence, function_word):
         """
         Retrieves all the conjunctions of a word so that all the necessary
-        subjects and objects are detected.
+        objects and negations are detected.
         """
 
         conjunctions = []
@@ -254,36 +244,35 @@ class Understand(object):
         for element in unflattened_list:
             if isinstance(element, collections.Iterable) and not \
                isinstance(element, basestring):
-                for subelement in flatten(element):
+                for subelement in self.flatten(element):
                     yield subelement
             else:
                 yield element
 
 
-    def correct_functions(self, verbs, subjects, objects, negations):
+    def correct_functions(self, verbs, objects, negations):
         """
-        Corrects the found verbs, subjects, objects and negations such that they
-        can easily be used for the database by copying verbs, subjects, objects
-        and negations where necessary such that the lists are all of equal
-        length.
+        Corrects the found verbs, objects and negations such that they can
+        easily be used for the database by copying verbs, objects and negations
+        where necessary such that the lists are all of equal length.
         """
 
-        sentences = [verbs, subjects, objects, negations]
+        sentences = [verbs, objects, negations]
         maximum_length = self.maximum_list_length(sentences)
 
         for i in range(0, len(sentences)):
             for j in range(0, len(sentences[i])):
-                if None in sentences[i][j]:
-                    sentences[i][j] = [sentences[i][j-1][0]]
-                    sentences[i][j].extend(repeat(sentences[i][j],
-                                                  maximum_length -
-                                                  len(sentences[i][j])))
-                elif len(sentences[i][j]) != maximum_length:
+                # if None in sentences[i][j]:
+                #     print "None in sentence"
+                #     sentences[i][j] = [sentences[i][j-1][0]]
+                #     sentences[i][j].extend(repeat(sentences[i][j],
+                #                                   maximum_length -
+                #                                   len(sentences[i][j])))
+                if len(sentences[i][j]) != maximum_length:
                     sentences[i][j].extend(repeat(sentences[i][j][0],
                                                   maximum_length -
                                                   len(sentences[i][j])))
-
-        return sentences[0], sentences[1], sentences[2], sentences[3]
+        return sentences[0], sentences[1], sentences[2]
 
 
     def maximum_list_length(self, long_list):
@@ -431,4 +420,4 @@ class Understand(object):
 
 if __name__ == "__main__":
     understand = Understand()
-    understand.understand_sentence("I don't have any lemons.")
+    understand.understand_sentence("I have two lemons.")
