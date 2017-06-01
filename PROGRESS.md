@@ -230,3 +230,21 @@ drink property value2: property value2}}}.
 ## Wednesday 31/05/2017 
 
 I changed the code to generate synonyms using Wordnet instead of PyDictionary, because the synonyms are more relevant and you can constrain them with a pos tag. I also changed the dict of key words, it is now an easier format and simply holds all a synonyms as key and the known word as value so that it is easy to retrieve the known word. I also wrote code to update the available drinks using a list of all the drink properties so that properties can be flagged True or False. I also worked a lot on my midterm progress presentation.
+
+## Thursday 01/06/2017
+
+The sentence "I do not have any peaches, but I do have limes." is incorrectly classified, because the negation is copied to the limes as well. There has to be made a new sentence when there is 'cc' in the parsed sentence.
+
+Meeting points
+
+- Demonstrate what is special and unqiue about a cocktail party: Why is it a different challenge? What is difficult that isn't difficult for other situations/contexts? E.g. there are loads of ingredients, because cocktails need so many ingredients
+- Social relevance: If you can have a good discussion about 1000 cocktails, then this can also be applied to other applications/contextx
+- Results: Demonstrate what was solved, e.g. conjunctions are correctly understood 'I have limes and lemons'.
+- Perhaps demonstrate that my method is better than someone else's
+- Demonstrate what accuracy of the used method is on drinks and that this method can also be applied to a different data set (one that is very similar, e.g. recipes)
+- Check if the review paper used fixed templates or variable ones -> innovative
+- Use probabilistics to choose the appropriate sentence
+- Complete human-robot interaction at a high level: state-of-the-art speech recognition, understanding and generation
+- A robot that leads the conversation is also innovative
+- PhD paper: Read the 10 desirables
+- World model: What do I want to say and generate questions of this? send -> decide -> act
