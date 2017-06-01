@@ -30,7 +30,7 @@ def find_naoqi_folder(ip):
     """
 
     temp_folder = "/var/volatile/tmp"
-    cmds = ["ssh nao@" + ip, "cd "+ temp_folder, "find . -name naoqi* " + \
+    cmds = ["ssh nao@" + ip, "cd "+ temp_folder, "find . -name 'naoqi*' " + \
         "-type d 2> /dev/null", "exit"]
     p = subprocess.Popen("/bin/bash", stdin=subprocess.PIPE,
              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -56,11 +56,16 @@ def transcribe_audio(recording_file):
             encoding="LINEAR16",
             sample_rate_hertz=16000)
 
-    alternatives = audio_sample.recognize("en-US")
     transcripts = ""
 
-    for alternative in alternatives:
-        transcripts = transcripts + alternative.transcript
+    try:
+        alternatives = audio_sample.recognize("en-US")
+
+        for alternative in alternatives:
+            transcripts = transcripts + alternative.transcript
+    except ValueError:
+        print "no sentence recognised"
+
     return transcripts
 
 
@@ -70,7 +75,8 @@ def recognise_speech(ip, recording_file):
 
 
 if __name__ == "__main__":
-    ip = "146.50.60.43"
-    start_time = time.time()
+    ip = "10.42.0.115"
+    copy_audio(ip, "recording.wav")
+    # start_time = time.time()
     print transcribe_audio("recording.wav")
-    print "total transcript time:", time.time() - start_time
+    # print "total transcript time:", time.time() - start_time

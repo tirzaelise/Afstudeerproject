@@ -42,9 +42,10 @@ class Understand(object):
                     word = verbs[i][j]
                     pos = "v"
                 # drink_property = self.find_drink_property(word, pos)
-                self.update_drinks(word, negations[i][j])
+                updated_drinks = self.update_drinks(word, negations[i][j])
 
         print self.available_drinks
+        return updated_drinks
 
 
     # def setup_program(ip):
@@ -356,9 +357,8 @@ class Understand(object):
                 if self.substring_in_list(found_key, drink_properties):
                     self.update_availability(drink_properties, found_key,
                                              negation)
-        # else:
-        # Robot did not understand
-
+                    return True
+        return False
 
 
     def update_availability(self, drink_properties, word, negation):
@@ -376,15 +376,14 @@ class Understand(object):
 
         for element in iterate_properties:
             if word in element:
-                property_index = drink_properties.index(element)
-                split_property = element.split(":")
                 if negation:
-                    # split_property[-1] = ": False"
                     drink = drink_properties[0].split(": ")[0]
                     self.available_drinks.remove(drink)
                     del self.properties[drink_property_index]
                     self.load_synonyms(self.available_drinks)
                 else:
+                    property_index = drink_properties.index(element)
+                    split_property = element.split(":")
                     split_property[-1] = ": True"
                     element = "".join(split_property)
                     drink_properties[property_index] = element
