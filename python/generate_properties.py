@@ -1,14 +1,23 @@
 # !/usr/bin/env python2
 
+# This file generates the properties of all the drinks in the database, which
+# were obtained using the Absolut Drinks Database. For each drink in the
+# database, the properties are saved in a list followed by ": None" so as to
+# indicate that there is no knowledge about whether this property is available
+# or not. This information is saved in a dictionary such that {drink name 1:
+# [property1: None, property2: None, etc]}. 
+
 import os
 import pickle
 
 
-def generate_property_list(drinks):
+def generate_property_dict():
+    """ Generates the dictionary of drinks properties. """
+
     database = load_database()
-    drink_list = create_drink_list(database, drinks)
-    # return create_drink_list(database, drinks)
-    save_properties(drink_list, "property_list.pkl")
+    properties = create_drink_dict(database)
+    pprint(properties)
+    save_properties(properties, "drinks_properties.pkl")
 
 
 def load_database():
@@ -18,36 +27,36 @@ def load_database():
         return pickle.load(open("database.pkl", "rb"))
 
 
-def create_drink_list(database, drinks):
+def create_drink_dict(database):
     """
-    Generates the list of all the properties of the drinks that were ordered
-    using the database.
+    Generates the properties, saved in a list, of all the drinks in the database
+    and saves them in a dictionary.
     """
 
-    all_properties = []
+    properties_dict = {}
 
-    for drink in drinks:
-        drink_list = []
+    for item in database:
+        drink_properties = []
 
         name, color, skill_level, alcoholic, carbonated, hot, ingredients, \
-            tastes, occasions, tools, actions = get_properties(drink, database)
+            tastes, occasions, tools, actions = get_properties(item, database)
         ingredients = only_ingredients(ingredients)
         tastes, occasions, tools, actions = split_lists(tastes, occasions,
                                                         tools, actions)
 
-        drink_list.append(name + ": None")
-        drink_list.append(color + ": None")
-        drink_list.append(skill_level + ": None")
-        drink_list.append(alcoholic + ": None")
-        drink_list.append(carbonated + ": None")
-        drink_list.append(hot + ": None")
-        drink_list = append_list(ingredients, drink_list)
-        drink_list = append_list(tastes, drink_list)
-        drink_list = append_list(occasions, drink_list)
-        drink_list = append_list(tools, drink_list)
-        drink_list = append_list(actions, drink_list)
-        all_properties.append(drink_list)
-    return all_properties
+        drink_properties.append(name + ": None")
+        drink_properties.append(color + ": None")
+        drink_properties.append(skill_level + ": None")
+        drink_properties.append(alcoholic + ": None")
+        drink_properties.append(carbonated + ": None")
+        drink_properties.append(hot + ": None")
+        drink_properties = append_list(ingredients, drink_properties)
+        drink_properties = append_list(tastes, drink_properties)
+        drink_properties = append_list(occasions, drink_properties)
+        drink_properties = append_list(tools, drink_properties)
+        drink_properties = append_list(actions, drink_properties)
+        properties_dict.update({name: drink_properties})
+    return properties_dict
 
 
 def get_properties(item, database):
@@ -128,4 +137,4 @@ def save_properties(properties, output_file):
     pickle.dump(properties, open(output_file, "wb"))
 
 if __name__ == "__main__":
-    generate_property_list(["martini", "margarita"])
+    generate_property_dict()
