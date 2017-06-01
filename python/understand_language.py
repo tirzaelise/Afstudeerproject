@@ -379,16 +379,16 @@ class Understand(object):
                 property_index = drink_properties.index(element)
                 split_property = element.split(":")
                 if negation:
-                    split_property[-1] = ": False"
+                    # split_property[-1] = ": False"
                     drink = drink_properties[0].split(": ")[0]
                     self.available_drinks.remove(drink)
                     del self.properties[drink_property_index]
                     self.load_synonyms(self.available_drinks)
                 else:
                     split_property[-1] = ": True"
-                element = "".join(split_property)
-                drink_properties[property_index] = element
-        self.properties[drink_property_index] = drink_properties
+                    element = "".join(split_property)
+                    drink_properties[property_index] = element
+                    self.properties[drink_property_index] = drink_properties
 
 
     def get_dict_keys(self, key, var):
@@ -420,4 +420,4 @@ class Understand(object):
 
 if __name__ == "__main__":
     understand = Understand()
-    understand.understand_sentence("I have two lemons.")
+    understand.understand_sentence("I do not have any lemons, but I do have peaches.")
