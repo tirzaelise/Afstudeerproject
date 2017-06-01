@@ -233,7 +233,9 @@ I changed the code to generate synonyms using Wordnet instead of PyDictionary, b
 
 ## Thursday 01/06/2017
 
-The sentence "I do not have any peaches, but I do have limes." is incorrectly classified, because the negation is copied to the limes as well. There has to be made a new sentence when there is 'cc' in the parsed sentence.
+The sentence "I do not have any peaches, but I do have limes." is incorrectly classified, because the negation is copied to the limes as well. There has to be made a new sentence when there is 'cc' in the parsed sentence. I fixed this error by searching for a contradictory "cc", such as 'but' and 'however', and splitting the sentence before and after this coordination. Also updated the event_listener code so the robot can only listen if it is not processing the previous sentence for example. 
+
+My public rsa key gets deleted off the Nao when BeHuman ini is uploaded, <a href="http://robotdiary.blogspot.nl/2011/06/transfer-files-tofrom-nao-from-your.html">this</a> is how to put it back. 
 
 Meeting points
 
