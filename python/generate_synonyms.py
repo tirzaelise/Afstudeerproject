@@ -20,7 +20,7 @@ def generate_synonym_dict():
     database = load_database()
     properties = load_properties()
     synonyms = make_synonyms(database, properties)
-    save_synonyms(sx  ynonyms, "synonyms.pkl")
+    save_synonyms(synonyms, "drinks_synonyms.pkl")
 
 
 def load_database():
