@@ -1,28 +1,26 @@
+# -*- coding: utf-8 -*-
 # !/usr/bin/env python2
 
-# This file creates the list of key words using the database that was created
+# This file creates a list of synonyms using the database that was created
 # from the Absolut Drinks Database. All the information that is in the database
-# is added to a dictionary of dictionaries and synonyms are generated of
-# the drink's temperature, carbonation, alcohol level, ingredients, tastes,
+# is added to a dictionary and synonyms are generated of
+# the drink's temperature, carbonated, alcoholic, ingredients, tastes,
 # occasions, tools and actions. This dictionary is of the following format:
-# {drink name: {drink property1: property value1, drink property2: {synonym of
-# drink property value2: property value2}}}
+# {drink name: {synonym 1: known word1, synonym2: known word2}}
 
 
 from nltk.corpus import wordnet as wn
 import os
 import pickle
-from pprint import pprint
 
 
-def generate_keywords(drinks):
-    """ Generates the key words of a list of drinks. """
+def generate_synonym_dict():
+    """ Generates the synonyms of all the drinks in the database. """
 
     database = load_database()
     properties = load_properties()
-    key_words = make_keywords(database, drinks, properties)
-    # return make_keywords(database, drinks)
-    save_keywords(key_words, "synonyms.pkl")
+    synonyms = make_synonyms(database, properties)
+    save_synonyms(sx  ynonyms, "synonyms.pkl")
 
 
 def load_database():
@@ -32,7 +30,19 @@ def load_database():
         return pickle.load(open("database.pkl", "rb"))
 
 
-def make_keywords(database, drinks, properties):
+def load_properties():
+    """
+    Returns a dict that holds a property as key and the desired part of speech
+    of the property as a value.
+    """
+
+    return {"color": wn.NOUN, "skill": wn.NOUN, "alcoholic": wn.ADJ,
+            "carbonation": wn.ADJ,  "temperature": wn.ADJ,
+            "ingredient": wn.NOUN, "taste": wn.NOUN, "occasion": wn.NOUN,
+            "tool": wn.NOUN, "action": wn.VERB}
+
+
+def make_synonyms(database, properties):
     """
     Creates a dictionary of key words using the drinks database using the name,
     colour, required skill level, whether it's alcoholic, whether it's
@@ -40,9 +50,10 @@ def make_keywords(database, drinks, properties):
     actions of the drink.
     """
 
-    key_words = {}
+    synonyms_dict = {}
 
-    for item in drinks:
+    for item in database:
+        synonyms = {}
         name, color, skill_level, alcoholic, carbonated, hot, ingredients, \
             tastes, occasions, tools, actions = get_properties(item, database)
 
@@ -50,20 +61,20 @@ def make_keywords(database, drinks, properties):
         tastes, occasions, tools, actions = split_lists(tastes, occasions,
                                                         tools, actions)
 
-        update_dictionary(key_words, "ingredient", ingredients, properties)
-        update_dictionary(key_words, "taste", tastes, properties)
-        update_dictionary(key_words, "occasion", occasions, properties)
-        update_dictionary(key_words, "tool", tools, properties)
-        update_dictionary(key_words, "action", actions, properties)
+        update_dictionary(synonyms, "ingredient", ingredients, properties)
+        update_dictionary(synonyms, "taste", tastes, properties)
+        update_dictionary(synonyms, "occasion", occasions, properties)
+        update_dictionary(synonyms, "tool", tools, properties)
+        update_dictionary(synonyms, "action", actions, properties)
 
-        key_words.update({"color": color})
-        key_words.update({"skill": skill_level})
-        key_words.update({"alcoholic": alcoholic})
-        key_words.update({"carbonated": carbonated})
-        key_words.update({"temperature": hot})
+        synonyms.update({"color": color})
+        synonyms.update({"skill": skill_level})
+        synonyms.update({"alcoholic": alcoholic})
+        synonyms.update({"carbonated": carbonated})
+        synonyms.update({"temperature": hot})
 
-        key_words.update({name: key_words})
-    return key_words
+        synonyms_dict.update({name: synonyms})
+    return synonyms_dict
 
 
 def get_properties(item, database):
@@ -114,9 +125,10 @@ def split_lists(tastes, occasions, tools, actions):
     actions = split_string(actions)
     return tastes, occasions, tools, actions
 
+
 def split_string(string):
     """
-    Use the words in a string to create a list that holds each word as an
+    Uses the words in a string to create a list that holds each word as an
     element.
     """
 
@@ -138,7 +150,7 @@ def clean_occasions(occasions):
 
 
 def update_dictionary(dictionary, key, value, properties):
-    """ Updates the dictionary with the same key and value. """
+    """ Updates the dictionary with the appropriate key and value. """
 
     if isinstance(value, list):
         for element in value:
@@ -146,26 +158,28 @@ def update_dictionary(dictionary, key, value, properties):
                 dictionary.update({" ".join(element): " ".join(element)})
                 for smaller_element in element:
                     dictionary.update({smaller_element: smaller_element})
-                    generate_synonyms(dictionary, key, smaller_element,
+                    get_synonyms(dictionary, key, smaller_element,
                                       properties)
             else:
                 dictionary.update({element: element})
-                generate_synonyms(dictionary, key, element, properties)
+                get_synonyms(dictionary, key, element, properties)
     else:
         dictionary.update({value: value})
-        generate_synonyms(dictionary, key, value, properties)
+        get_synonyms(dictionary, key, value, properties)
 
 
-def generate_synonyms(dict_to_update, key, word, properties):
+def get_synonyms(dict_to_update, key, word, properties):
     """
-    Generates the synonyms of a word and appends it to the dictionary of key
-    words using itself as a key and the word the synonym was generated from as
-    value.
+    Generates the synonyms of a word and appends it to the dictionary of
+    synonyms using itself as a key and the word the synonym was generated from
+    as value.
     """
 
     pos = properties.get(key)
 
     word = word.encode("utf-8").lower()
+    word = word.decode("utf-8")
+
     if wn.morphy(word):
         word = wn.morphy(word)
     synsets = wn.synsets(word, pos=pos)
@@ -177,23 +191,11 @@ def generate_synonyms(dict_to_update, key, word, properties):
                 dict_to_update.update({lemma: word})
 
 
-def load_properties():
-    """
-    Returns a dict that holds a property as key and the desired part of speech
-    of the property as a value.
-    """
+def save_synonyms(synonyms, output_file):
+    """ Saves the synonyms in a Pickle file. """
 
-    return {"color": wn.NOUN, "skill": wn.NOUN, "alcoholic": wn.ADJ,
-            "carbonation": wn.ADJ,  "temperature": wn.ADJ,
-            "ingredient": wn.NOUN, "taste": wn.NOUN, "occasion": wn.NOUN,
-            "tool": wn.NOUN, "action": wn.VERB}
-
-
-def save_keywords(key_words, output_file):
-    """ Saves the key words in a Pickle file. """
-
-    pickle.dump(key_words, open(output_file, "wb"))
+    pickle.dump(synonyms, open(output_file, "wb"))
 
 
 if __name__ == "__main__":
-    generate_keywords(["martini", "margarita"])
+    generate_synonym_dict()
