@@ -21,8 +21,8 @@ import time
 
 class Understand(object):
 
-    def __init__(self):
-        self.ordered_drinks = ["margarita", "martini", "bloody mary"]
+    def __init__(self, ordered_drinks):
+        self.ordered_drinks = ordered_drinks
         self.available_drinks = self.ordered_drinks
         self.setup_program()
 
@@ -61,6 +61,7 @@ class Understand(object):
         self.load_synonyms(self.ordered_drinks)
         self.load_pos_tags()
         self.load_properties()
+        print self.properties
 
 
     def load_database(self):
@@ -357,8 +358,8 @@ class Understand(object):
                 if self.substring_in_list(found_key, drink_properties):
                     self.update_availability(drink_properties, found_key,
                                              negation)
-                    return True
-        return False
+                    return True, self.properties
+        return False, self.properties
 
 
     def update_availability(self, drink_properties, word, negation):
@@ -418,5 +419,5 @@ class Understand(object):
 
 
 if __name__ == "__main__":
-    understand = Understand()
+    understand = Understand(["margarita", "martini", "bloody mary"])
     understand.understand_sentence("I do not have any lemons, but I do have peaches.")
