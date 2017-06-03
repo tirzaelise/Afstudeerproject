@@ -250,3 +250,7 @@ Meeting points
 - A robot that leads the conversation is also innovative
 - PhD paper: Read the 10 desirables
 - World model: What do I want to say and generate questions of this? send -> decide -> act
+
+## Friday 02/06/2017
+
+I started writing the code to generate natural language.
