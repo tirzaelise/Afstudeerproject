@@ -5,7 +5,7 @@
 # database, the properties are saved in a list followed by ": None" so as to
 # indicate that there is no knowledge about whether this property is available
 # or not. This information is saved in a dictionary such that {drink name 1:
-# [property1: None, property2: None, etc]}. 
+# [property1: None, property2: None, etc]}.
 
 import os
 import pickle
@@ -16,7 +16,6 @@ def generate_property_dict():
 
     database = load_database()
     properties = create_drink_dict(database)
-    pprint(properties)
     save_properties(properties, "drinks_properties.pkl")
 
 
@@ -44,17 +43,18 @@ def create_drink_dict(database):
         tastes, occasions, tools, actions = split_lists(tastes, occasions,
                                                         tools, actions)
 
-        drink_properties.append(name + ": None")
-        drink_properties.append(color + ": None")
-        drink_properties.append(skill_level + ": None")
-        drink_properties.append(alcoholic + ": None")
-        drink_properties.append(carbonated + ": None")
-        drink_properties.append(hot + ": None")
-        drink_properties = append_list(ingredients, drink_properties)
-        drink_properties = append_list(tastes, drink_properties)
-        drink_properties = append_list(occasions, drink_properties)
-        drink_properties = append_list(tools, drink_properties)
-        drink_properties = append_list(actions, drink_properties)
+        drink_properties.append(name + ": None // name")
+        drink_properties.append(color + ": None // color")
+        drink_properties.append(skill_level + ": None // skill_level")
+        drink_properties.append(alcoholic + ": None // alcoholic")
+        drink_properties.append(carbonated + ": None // carbonated")
+        drink_properties.append(hot + ": None // hot")
+        drink_properties = append_list(ingredients, drink_properties,
+                                       "ingredient")
+        drink_properties = append_list(tastes, drink_properties, "taste")
+        drink_properties = append_list(occasions, drink_properties, "occasion")
+        drink_properties = append_list(tools, drink_properties, "tool")
+        drink_properties = append_list(actions, drink_properties, "action")
         properties_dict.update({name: drink_properties})
     return properties_dict
 
@@ -120,14 +120,14 @@ def split_string(string):
     return string_list
 
 
-def append_list(unappended_list, list_to_append):
+def append_list(unappended_list, list_to_append, property_type):
     """
     Appends all items in a list to a different list and adds ': None' to each
     element.
     """
 
     for element in unappended_list:
-        list_to_append.append(element + ": None")
+        list_to_append.append(element + ": None // " + property_type)
     return list_to_append
 
 
