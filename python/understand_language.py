@@ -61,7 +61,6 @@ class Understand(object):
         self.load_synonyms(self.ordered_drinks)
         self.load_pos_tags()
         self.load_properties()
-        print self.properties
 
 
     def load_database(self):
@@ -384,25 +383,9 @@ class Understand(object):
                     self.load_synonyms(self.available_drinks)
                 else:
                     property_index = drink_properties.index(element)
-                    split_property = element.split(":")
-                    split_property[-1] = ": True"
-                    element = "".join(split_property)
+                    element = element.replace("None", "True")
                     drink_properties[property_index] = element
                     self.properties[drink_property_index] = drink_properties
-
-
-    def get_dict_keys(self, key, var):
-        """
-        Searches the entire dict for a key and returns the value.
-        """
-
-        if hasattr(var, "iteritems"):
-            for k, v in var.iteritems():
-                if k == key:
-                    yield v
-                if isinstance(v, dict):
-                    for result in self.get_dict_keys(key, v):
-                        yield result
 
 
     def substring_in_list(self, substring, l_ist):
@@ -420,4 +403,4 @@ class Understand(object):
 
 if __name__ == "__main__":
     understand = Understand(["margarita", "martini", "bloody mary"])
-    understand.understand_sentence("I do not have any lemons, but I do have peaches.")
+    understand.understand_sentence("I have lemons.")
