@@ -9,8 +9,7 @@ class Generate(object):
 
     def __init__(self):
         self.load_templates()
-        # self.load_dict()
-
+        
 
     def load_templates(self):
         """
