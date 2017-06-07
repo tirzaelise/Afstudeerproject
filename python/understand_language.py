@@ -97,6 +97,11 @@ class Understand(object):
 
 
     def understand_sentence(self, question, answer):
+        """
+        Use the main verb, object and negation of a sentence to 'understand' it
+        and update the database with it.
+        """
+        
         parsed_answer = self.parse_sentence(answer)
         answer_verbs = self.get_verbs(answer, parsed_answer)
 
@@ -112,27 +117,6 @@ class Understand(object):
                                             "")
 
         return self.apply_sentence(v, o, n)
-
-
-    # def setup_robot(ip, key_words):
-    #     """
-    #     Uses the robot's IP address to create a proxy on the speech recognition
-    #     module. Sets the speech recognition language to English and uses the list
-    #     of key words as vocabulary.
-    #     """
-    #
-    #     global asr
-    #     global alm
-    #
-    #     asr = ALProxy("ALSpeechRecognition", ip, 9559)
-    #     asr.setLanguage("English")
-    #     start_time = time.time()
-    #     # asr.setVocabulary(key_words, True)
-    #     asr.setVocabulary(key_words, False)
-    #     print "set vocab time:", time.time() - start_time
-    #     asr.setVisualExpression(True)
-    #     asr.setAudioExpression(False)
-    #     alm = ALProxy("ALMemory", ip, 9559)
 
 
     def parse_sentence(self, sentence):
@@ -301,12 +285,6 @@ class Understand(object):
 
         for i in range(0, len(sentences)):
             for j in range(0, len(sentences[i])):
-                # if None in sentences[i][j]:
-                #     print "None in sentence"
-                #     sentences[i][j] = [sentences[i][j-1][0]]
-                #     sentences[i][j].extend(repeat(sentences[i][j],
-                #                                   maximum_length -
-                #                                   len(sentences[i][j])))
                 if len(sentences[i][j]) != maximum_length:
                     sentences[i][j].extend(repeat(sentences[i][j][0],
                                                   maximum_length -
