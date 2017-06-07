@@ -254,3 +254,11 @@ Meeting points
 ## Friday 02/06/2017
 
 I started writing the code to generate natural language.
+
+## Monday 05/06/2017
+
+I updated the code to create properties so that an element in the property list also contains what type of property it is. This is necessary to get the correct relevant question template. I also updated the understand language code to work with this new setup and finished the basis of the natural language generation code.
+
+## Wednesday 07/06/2017
+
+I worked on the understand language code so that it understands sentences without main verbs such as "No, I don't" and sentences without any verbs, such as "Yes". In this case, I use the verbs and objects of the asked question. This does not work for actions yet. I also realised it would be handy to have a built-in function to ask the robot to repeat the question. I also finished the basis of the program, but there are still some bugs that I found that I need to fix: an empty action answer does not work and 'yes' is not recognised as an answer.
