@@ -98,10 +98,10 @@ class Understand(object):
 
     def understand_sentence(self, question, answer):
         """
-        Use the main verb, object and negation of a sentence to 'understand' it
-        and update the database with it.
+        Uses the main verb, object and negation of a sentence to 'understand' it
+        and updates the database with it.
         """
-        
+
         parsed_answer = self.parse_sentence(answer)
         answer_verbs = self.get_verbs(answer, parsed_answer)
 
@@ -180,12 +180,12 @@ class Understand(object):
             # The answer is either only 'yes' or 'no'
             if "no" in answer or "No" in answer:
                 # The answer is not affirmative: 'No'
-                v, o, n = self.analyse_sentence(verbs, parsed_question, True,
-                                                "not")
+                v, o, n = self.analyse_sentence(question_verbs, parsed_question,
+                                                True, "not")
             else:
                 # The answer is affirmative: 'Yes'
-                v, o, n = self.analyse_sentence(verbs, parsed_question, True,
-                                                None)
+                v, o, n = self.analyse_sentence(question_verbs, parsed_question,
+                                                True, None)
         else:
             # The answer is something along the lines of 'I do'
             _, _, n = self.analyse_sentence(answer_verbs, parsed_answer, False,
@@ -437,6 +437,18 @@ class Understand(object):
         return False
 
 
+    def get_properties(self):
+        """ Returns the list of properties. """
+
+        return self.properties
+
+
+    def get_available_drinks(self):
+        """ Returns the list of available drinks. """
+
+        return self.available_drinks
+
+
 if __name__ == "__main__":
     understand = Understand(["margarita", "martini", "bloody mary"])
-    understand.understand_sentence("Do you have any lemons?", "No, I don't")
+    understand.understand_sentence("Do you have any lemons?", "No")
