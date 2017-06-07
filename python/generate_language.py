@@ -9,7 +9,7 @@ class Generate(object):
 
     def __init__(self):
         self.load_templates()
-        
+
 
     def load_templates(self):
         """
@@ -18,9 +18,24 @@ class Generate(object):
 
         self.templates = []
 
-        if os.path.exists("templates.txt"):
-            for line in open("templates.txt", "r"):
+        if os.path.exists("question_templates.txt"):
+            for line in open("question_templates.txt", "r"):
                 self.templates.append(line.replace("\n", ""))
+
+
+    def generate_language(self, properties):
+        """
+        Uses the list of properties to generate a random question using the text
+        file of question templates. If there are no more unknown properties,
+        then the program can be completed.
+        """
+
+        drink_property = self.find_drink_property(properties)
+
+        if drink_property:
+            return self.generate_sentence(drink_property)
+        else:
+            return ""
 
 
     def find_drink_property(self, properties):
@@ -70,7 +85,8 @@ class Generate(object):
         drink_property = complete_property.split(": ")[0]
         property_type = complete_property.split(": ")[1].split("// ")[1]
         template = self.get_template(property_type)
-        return template.replace("{" + property_type + "}", drink_property)
+        question = template.replace("{" + property_type + "}", drink_property)
+        return self.get_correct_form(question)
 
 
     def get_template(self, property_type):
@@ -82,6 +98,31 @@ class Generate(object):
         valid_templates = [s for s in self.templates if "{" + property_type + \
                            "}" in s]
         return choice(valid_templates)
+
+
+    def get_correct_form(self, template):
+        """
+        Returns the correct form of a question such that e.g. 'a(n) strainer'
+        becomes 'a strainer'.
+        """
+
+        if "(" in template and ")" in template:
+            index = template.index(")")
+            first_letter = template[index+2]
+            if self.is_vowel(first_letter):
+                template = template.replace("a(n)", "an")
+            else:
+                template = template.replace("a(n)", "a")
+        return template
+
+
+    def is_vowel(self, letter):
+        """ Returns a boolean that indicates whether a letter is a boolean. """
+
+        if letter in ("a", "e", "i", "o", "u", "A", "E", "I", "O", "U"):
+            return True
+        return False
+
 
 
 def load_properties(ordered_drinks):
@@ -98,7 +139,4 @@ def load_properties(ordered_drinks):
 if __name__ == "__main__":
     properties = load_properties(["martini", "margarita", "bloody mary"])
     generate = Generate()
-    drink_property = generate.find_drink_property(properties)
-
-    if drink_property:
-        generate.generate_sentence(drink_property)
+    generate.generate_language(properties)
