@@ -6,11 +6,14 @@
 
 
 import os
+from random import choice
 from recognise_speech import recognise_speech
 import subprocess
 import sys
 import time
+
 from understand_language import Understand
+from generate_language import Generate
 
 from naoqi import ALBroker, ALProxy, ALModule
 
@@ -18,14 +21,15 @@ from naoqi import ALBroker, ALProxy, ALModule
 class TouchDetectorModule(ALModule):
     """ This class detects whether the Nao's left hand is touched. """
 
-    def __init__(self, name, ip, recording_file, understand):
+    def __init__(self, name, ip, ats, recording_file, understand, generate,
+                 question):
         ALModule.__init__(self, name)
 
-        # self.alm.unsubscribeToEvent("HandLeftBackTouched", "TouchDetector")
-
+        self.load_templates()
         self.alt = ALProxy("ALTouch", ip, 9559)
         self.als = ALProxy("ALLeds", ip, 9559)
         self.aar = ALProxy("ALAudioRecorder", ip, 9559)
+        self.ats = ats
         self.alm = ALProxy("ALMemory")
         self.alm.subscribeToEvent("HandLeftBackTouched", "TouchDetector",
                                   "onTouched")
@@ -33,6 +37,26 @@ class TouchDetectorModule(ALModule):
         self.ip = ip
         self.recording_file = recording_file
         self.understand = understand
+        self.generate = generate
+        self.question = question
+
+
+    def load_templates(self):
+        """
+        Loads the templates of replies and saves them as a list in a dictionary.
+        """
+
+        self.templates = {}
+
+        if os.path.exists("reply_templates.txt"):
+            for line in open("reply_templates.txt", "r"):
+                key, value = line.split(": ")
+                if not key in self.templates:
+                    self.templates.update({key: [value]})
+                else:
+                    existent_value = self.templates.get(key)
+                    existent_value.append(value)
+                    self.templates.update({key: existent_value})
 
 
     def onTouched(self, *_args):
@@ -62,17 +86,32 @@ class TouchDetectorModule(ALModule):
             print sentence
 
             if sentence:
-                understood = understand.understand_sentence(sentence)
+                understood, properties = \
+                    understand.understand_sentence(question, sentence)
                 if understood:
-                    # Updated the drinks so next question
-                    print "understood"
+                    # Understood and updated the drinks
+                    key = "understand_affirmative"
                 else:
-                    # I did not understand
-                    print "did not understand"
-            else:
-                print "did not hear"
-                # I did not hear what you said
+                    # Did not understand
+                    key = "understand_negative"
 
+                self.question = generate.generate_language(properties)
+
+                if question:
+                    self.ats.say(str(self.question))
+                else:
+                    available_drinks = understand.get_available_drinks()
+                    available_string = ", ".join(available_drinks)
+                    finished = "I think I have all the information I need." + \
+                        "The available drinks are " + available_string
+                    self.ats.say(finished)
+            else:
+                # Did not hear
+                key = "not_heard"
+            reply = choice(self.templates.get(key))
+            self.ats.say(reply)
+
+        # Ask new question
 
         self.alm.subscribeToEvent("HandLeftBackTouched", "TouchDetector",
                                   "onTouched")
@@ -95,12 +134,21 @@ class TouchDetectorModule(ALModule):
 
 
 if __name__ == "__main__":
-    understand = Understand()
+    ordered_drinks = ["margarita", "martini", "bloody mary"]
+    understand = Understand(ordered_drinks)
+    properties = understand.get_properties()
+    generate = Generate()
+    question = generate.generate_language(properties)
+
     global TouchDetector
-    ip = "10.42.0.115"
+    ip = "berta.local"
+    ats = ALProxy("ALTextToSpeech", ip, 9559)
+    ats.say(str(question))
+
     ownBroker = ALBroker("ownBroker", "0.0.0.0", 0, ip, 9559)
-    TouchDetector = TouchDetectorModule("TouchDetector", ip, "recording.wav",
-                                        understand)
+    TouchDetector = TouchDetectorModule("TouchDetector", ip, ats,
+                                        "recording.wav", understand, generate,
+                                        question)
 
     while True:
         try:

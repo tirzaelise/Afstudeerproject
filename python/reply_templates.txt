@@ -1,0 +1,11 @@
+understand_affirmative: Okay, good to know.
+understand_affirmative: Okay, I understand.
+understand_affirmative: Okay.
+understand_affirmative: Alright.
+understand_negative: Sorry, I don't understand. Could you use different words?
+understand_negative: I'm not sure I understand. Could you use different words?
+understand_negative: I don't understand, sorry. Could you use different words?
+understand_negative: Hm, I don't understand. Could you use different words?
+not_heard: Sorry, what did you say?
+not_heard: Sorry, I didn't hear you.
+not_heard: I'm sorry, I didn't hear. What were you saying?
