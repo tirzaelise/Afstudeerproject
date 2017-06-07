@@ -27,28 +27,6 @@ class Understand(object):
         self.setup_program()
 
 
-    def understand_sentence(self, sentence):
-        parsed_sentence = self.parse_sentence(sentence)
-        verbs = self.get_verbs(sentence, parsed_sentence)
-        verbs, objects, negations = self.analyse_sentence(verbs,
-                                                          parsed_sentence)
-
-        for i in range(0, len(verbs)):
-            for j in range(0, len(verbs[i])):
-                if self.is_possessive(verbs[i][j]):
-                    word = objects[i][j]
-                    pos = "n"
-                else:
-                    word = verbs[i][j]
-                    pos = "v"
-                # drink_property = self.find_drink_property(word, pos)
-                updated_drinks = self.update_drinks(word, negations[i][j])
-
-        print self.available_drinks
-        return updated_drinks
-
-
-    # def setup_program(ip):
     def setup_program(self):
         """
         Sets up the program by loading the database, parser, key words and
@@ -118,6 +96,24 @@ class Understand(object):
             self.properties.append(all_properties.get(drink))
 
 
+    def understand_sentence(self, question, answer):
+        parsed_answer = self.parse_sentence(answer)
+        answer_verbs = self.get_verbs(answer, parsed_answer)
+
+        if self.is_empty_answer(parsed_answer, answer_verbs):
+            # Use question's verbs and objects, but answer's negation
+            parsed_question = self.parse_sentence(question)
+            question_verbs = self.get_verbs(question, parsed_question)
+            v, o, n = self.analyse_empty_sentence(answer, parsed_answer,
+                                                  parsed_question, answer_verbs,
+                                                  question_verbs)
+        else:
+            v, o, n = self.analyse_sentence(answer_verbs, parsed_answer, False,
+                                            "")
+
+        return self.apply_sentence(v, o, n)
+
+
     # def setup_robot(ip, key_words):
     #     """
     #     Uses the robot's IP address to create a proxy on the speech recognition
@@ -176,7 +172,46 @@ class Understand(object):
         return True
 
 
-    def analyse_sentence(self, verbs, sentence):
+    def is_empty_answer(self, sentence, verbs):
+        """
+        Checks if there were no verbs in a sentence or if the verb 'do' is
+        in the sentence without any object. In this case, the question's verbs
+        and objects should be used.
+        """
+
+        if len(sentence) == 0 or (any("do" in verb for verb in verbs) \
+            and not any("dobj" in element for element in sentence)):
+            return True
+        return False
+
+
+    def analyse_empty_sentence(self, answer, parsed_answer, parsed_question,
+                               answer_verbs, question_verbs):
+        """
+        Uses the parsed answer and question to return the correct verbs,
+        objects and negations.
+        """
+
+        if len(parsed_answer) == 0:
+            # The answer is either only 'yes' or 'no'
+            if "no" in answer or "No" in answer:
+                # The answer is not affirmative: 'No'
+                v, o, n = self.analyse_sentence(verbs, parsed_question, True,
+                                                "not")
+            else:
+                # The answer is affirmative: 'Yes'
+                v, o, n = self.analyse_sentence(verbs, parsed_question, True,
+                                                None)
+        else:
+            # The answer is something along the lines of 'I do'
+            _, _, n = self.analyse_sentence(answer_verbs, parsed_answer, False,
+                                            "")
+            v, o, _ = self.analyse_sentence(question_verbs, parsed_question,
+                                            False, "")
+        return v, o, n
+
+
+    def analyse_sentence(self, verbs, sentence, negation_flag, own_negation):
         """ Analyses a sentence: returns the verb, object and negation. """
 
         objects = []
@@ -187,8 +222,11 @@ class Understand(object):
         for i in range(0, len(sentences)):
             objects.append(self.get_function_word(sentences[i], verbs[i][0],
                                                   "dobj"))
-            negations.append(self.get_function_word(sentences[i], verbs[i][0],
-                                                    "neg"))
+            if not negation_flag:
+                negations.append(self.get_function_word(sentences[i],
+                                                        verbs[i][0], "neg"))
+            else:
+                negations.append([own_negation])
         verbs, objects, negations = self.correct_functions(verbs, objects,
                                                            negations)
         return verbs, objects, negations
@@ -340,6 +378,26 @@ class Understand(object):
         return any(verb in string for string in possesive)
 
 
+    def apply_sentence(self, verbs, objects, negations):
+        """
+        Uses the verbs, objects and negations to update the list of drinks.
+        """
+
+        for i in range(0, len(verbs)):
+            for j in range(0, len(verbs[i])):
+                if self.is_possessive(verbs[i][j]):
+                    word = objects[i][j]
+                    pos = "n"
+                else:
+                    word = verbs[i][j]
+                    pos = "v"
+                # drink_property = self.find_drink_property(word, pos)
+                updated_drinks = self.update_drinks(word, negations[i][j])
+
+        print self.available_drinks
+        return updated_drinks
+
+
     def update_drinks(self, word, negation):
         """
         Updates the list of property values of the ordered drinks if a match
@@ -403,4 +461,4 @@ class Understand(object):
 
 if __name__ == "__main__":
     understand = Understand(["margarita", "martini", "bloody mary"])
-    understand.understand_sentence("I have lemons.")
+    understand.understand_sentence("Do you have any lemons?", "No, I don't")
