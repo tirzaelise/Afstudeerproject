@@ -38,10 +38,9 @@ def create_drink_dict(database):
         drink_properties = []
 
         name, color, skill_level, alcoholic, carbonated, hot, ingredients, \
-            tastes, occasions, tools, actions = get_properties(item, database)
+            tastes, tools, actions = get_properties(item, database)
         ingredients = only_ingredients(ingredients)
-        tastes, occasions, tools, actions = split_lists(tastes, occasions,
-                                                        tools, actions)
+        tastes, tools, actions = split_lists(tastes, tools, actions)
 
         drink_properties.append(name + ": None // name")
         drink_properties.append(color + ": None // color")
@@ -52,7 +51,6 @@ def create_drink_dict(database):
         drink_properties = append_list(ingredients, drink_properties,
                                        "ingredient")
         drink_properties = append_list(tastes, drink_properties, "taste")
-        drink_properties = append_list(occasions, drink_properties, "occasion")
         drink_properties = append_list(tools, drink_properties, "tool")
         drink_properties = append_list(actions, drink_properties, "action")
         properties_dict.update({name: drink_properties})
@@ -64,7 +62,7 @@ def get_properties(item, database):
 
     drink = database.get(item)
     return drink[0], drink[2], drink[3], drink[4], drink[5], drink[6], \
-        drink[7], drink[8], drink[9], drink[10], drink[11]
+        drink[7], drink[8], drink[9], drink[10]
 
 
 def only_ingredients(ingredients):
@@ -97,14 +95,13 @@ def remove_measurements(string):
     return " ".join(split_string)
 
 
-def split_lists(tastes, occasions, tools, actions):
+def split_lists(tastes, tools, actions):
     """ Returns the strings as lists. """
 
     tastes = split_string(tastes)
-    occasions = split_string(occasions)
     tools = split_string(tools)
     actions = split_string(actions)
-    return tastes, occasions, tools, actions
+    return tastes, tools, actions
 
 
 def split_string(string):

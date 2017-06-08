@@ -80,8 +80,7 @@ class Understand(object):
                          "alcoholic": wn.ADJ, "non-alcoholic": wn.ADJ,
                          "carbonated": wn.ADJ, "non-carbonated": wn.ADJ,
                          "hot": wn.ADJ, "cold": wn.ADJ, "ingredient": wn.NOUN,
-                         "taste": wn.NOUN, "occasion": wn.NOUN,
-                         "tool": wn.NOUN, "action": wn.VERB}
+                         "taste": wn.NOUN, "tool": wn.NOUN, "action": wn.VERB}
 
 
     def load_properties(self):
@@ -108,15 +107,13 @@ class Understand(object):
         if self.is_empty_answer(parsed_answer, answer_verbs):
             # Use question's verbs and objects, but answer's negation
             parsed_question = self.parse_sentence(question)
-            # TODO: actions don't work
-            pprint(parsed_question)
             question_verbs = self.get_verbs(question, parsed_question)
             v, o, n = self.analyse_empty_sentence(answer, parsed_answer,
                                                   parsed_question, answer_verbs,
                                                   question_verbs)
         else:
-            v, o, n = self.analyse_sentence(answer_verbs, parsed_answer,
-                                            False, "")
+            v, o, n = self.analyse_sentence(answer_verbs, parsed_answer, False,
+                                            "")
         return self.apply_sentence(v, o, n)
 
 
@@ -134,8 +131,6 @@ class Understand(object):
         verbs = []
         tokenized_sentence = word_tokenize(sentence)
         tagged_sentence = pos_tag(tokenized_sentence)
-
-        print tagged_sentence
 
         for word in tagged_sentence:
             if word[1].startswith("VB") and not \
@@ -173,7 +168,6 @@ class Understand(object):
                    "VB" in parsed_element[0]:
                    verbs.remove(verb)
         return verbs
-
 
 
     def is_empty_answer(self, sentence, verbs):

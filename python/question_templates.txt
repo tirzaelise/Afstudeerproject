@@ -1,12 +1,11 @@
 Do you have any {color} drinks?
 Is your skill level {skill_level}?
-Can you make {occasion}?
 Do you have any {alcoholic} drinks?
 Do you have any {carbonated} drinks?
 Do you have any {hot} drinks?
 Do you have any {taste} drinks?
 Do you have any {ingredient}?
 Do you have a(n) {tool}?
-Do you know how to do the action {action}?
+Can you {action} drinks?
 What ingredients do you have?
 What tools do you have?

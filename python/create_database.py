@@ -5,7 +5,6 @@
 # Pickle file in a Dictionary using the following format:
 # {drink name: list of drink properties}.
 
-import drink
 import json
 import os.path
 import cPickle as pickle
@@ -55,8 +54,8 @@ def get_info(drink):
     """
 
     properties = ["name", "descriptionPlain", "color", "skill", "isAlcoholic",
-                  "isCarbonated", "isHot", "ingredients", "tastes", "occasions",
-                  "tools", "actions"]
+                  "isCarbonated", "isHot", "ingredients", "tastes", "tools",
+                  "actions"]
     info = []
 
     for drink_property in properties:

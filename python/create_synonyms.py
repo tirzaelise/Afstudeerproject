@@ -4,8 +4,8 @@
 # This file creates a list of synonyms using the database that was created
 # from the Absolut Drinks Database. All the information that is in the database
 # is added to a dictionary and synonyms are generated of
-# the drink's temperature, carbonated, alcoholic, ingredients, tastes,
-# occasions, tools and actions. This dictionary is of the following format:
+# the drink's temperature, carbonated, alcoholic, ingredients, tastes, tools and
+# actions. This dictionary is of the following format:
 # {drink name: {synonym 1: known word1, synonym2: known word2}}
 
 
@@ -38,16 +38,16 @@ def load_properties():
 
     return {"color": wn.NOUN, "skill": wn.NOUN, "alcoholic": wn.ADJ,
             "carbonation": wn.ADJ,  "temperature": wn.ADJ,
-            "ingredient": wn.NOUN, "taste": wn.NOUN, "occasion": wn.NOUN,
-            "tool": wn.NOUN, "action": wn.VERB}
+            "ingredient": wn.NOUN, "taste": wn.NOUN, "tool": wn.NOUN,
+            "action": wn.VERB}
 
 
 def make_synonyms(database, properties):
     """
     Creates a dictionary of key words using the drinks database using the name,
     colour, required skill level, whether it's alcoholic, whether it's
-    carbonated, whether it's hot, ingredients, tastes, occasions, tools and
-    actions of the drink.
+    carbonated, whether it's hot, ingredients, tastes, tools and actions of the
+    drink.
     """
 
     synonyms_dict = {}
@@ -55,15 +55,13 @@ def make_synonyms(database, properties):
     for item in database:
         synonyms = {}
         name, color, skill_level, alcoholic, carbonated, hot, ingredients, \
-            tastes, occasions, tools, actions = get_properties(item, database)
+            tastes, tools, actions = get_properties(item, database)
 
         ingredients = only_ingredients(ingredients)
-        tastes, occasions, tools, actions = split_lists(tastes, occasions,
-                                                        tools, actions)
+        tastes, tools, actions = split_lists(tastes, tools, actions)
 
         update_dictionary(synonyms, "ingredient", ingredients, properties)
         update_dictionary(synonyms, "taste", tastes, properties)
-        update_dictionary(synonyms, "occasion", occasions, properties)
         update_dictionary(synonyms, "tool", tools, properties)
         update_dictionary(synonyms, "action", actions, properties)
 
@@ -82,7 +80,7 @@ def get_properties(item, database):
 
     drink = database.get(item)
     return drink[0], drink[2], drink[3], drink[4], drink[5], drink[6], \
-        drink[7], drink[8], drink[9], drink[10], drink[11]
+        drink[7], drink[8], drink[9], drink[10]
 
 
 def only_ingredients(ingredients):
@@ -115,15 +113,13 @@ def remove_measurements(string):
     return split_string
 
 
-def split_lists(tastes, occasions, tools, actions):
+def split_lists(tastes, tools, actions):
     """ Returns the strings as lists. """
 
     tastes = split_string(tastes)
-    occasions = split_string(occasions)
-    occasions = clean_occasions(occasions)
     tools = split_string(tools)
     actions = split_string(actions)
-    return tastes, occasions, tools, actions
+    return tastes, tools, actions
 
 
 def split_string(string):
@@ -137,16 +133,6 @@ def split_string(string):
     for word in string.split(", "):
         string_list.append(word)
     return string_list
-
-
-def clean_occasions(occasions):
-    """ Removes ' drinks' from the occasions. """
-    new_occasions = []
-
-    for occasion in occasions:
-        occasion = occasion.replace(" drinks", "")
-        new_occasions.append(occasion)
-    return new_occasions
 
 
 def update_dictionary(dictionary, key, value, properties):
