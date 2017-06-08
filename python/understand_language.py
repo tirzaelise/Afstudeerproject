@@ -108,14 +108,15 @@ class Understand(object):
         if self.is_empty_answer(parsed_answer, answer_verbs):
             # Use question's verbs and objects, but answer's negation
             parsed_question = self.parse_sentence(question)
+            # TODO: actions don't work
+            pprint(parsed_question)
             question_verbs = self.get_verbs(question, parsed_question)
             v, o, n = self.analyse_empty_sentence(answer, parsed_answer,
                                                   parsed_question, answer_verbs,
                                                   question_verbs)
         else:
-            v, o, n = self.analyse_sentence(answer_verbs, parsed_answer, False,
-                                            "")
-
+            v, o, n = self.analyse_sentence(answer_verbs, parsed_answer,
+                                            False, "")
         return self.apply_sentence(v, o, n)
 
 
@@ -134,10 +135,14 @@ class Understand(object):
         tokenized_sentence = word_tokenize(sentence)
         tagged_sentence = pos_tag(tokenized_sentence)
 
+        print tagged_sentence
+
         for word in tagged_sentence:
             if word[1].startswith("VB") and not \
                self.is_auxiliary(parsed_sentence, word[0]):
                 verbs.append([word[0]])
+
+        verbs = self.check_verbs(verbs, parsed_sentence)
         return verbs
 
 
@@ -154,6 +159,21 @@ class Understand(object):
             if word[0][0] == verb or word[2][0] == verb and word[1] != "aux":
                 return False
         return True
+
+
+    def check_verbs(self, verbs, parsed_sentence):
+        """
+        Checks if a found verb is also classified as a verb in the tagged
+        sentence, because the NLTK POS tagger sometimes makes mistakes.
+        """
+
+        for verb in verbs:
+            for parsed_element in parsed_sentence:
+                if not verb[0] in parsed_element[0] or not \
+                   "VB" in parsed_element[0]:
+                   verbs.remove(verb)
+        return verbs
+
 
 
     def is_empty_answer(self, sentence, verbs):
@@ -451,4 +471,4 @@ class Understand(object):
 
 if __name__ == "__main__":
     understand = Understand(["margarita", "martini", "bloody mary"])
-    understand.understand_sentence("Do you have any lemons?", "No")
+    understand.understand_sentence("Do you have lemon juice?", "yes")
