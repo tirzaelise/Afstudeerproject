@@ -262,3 +262,8 @@ I updated the code to create properties so that an element in the property list 
 ## Wednesday 07/06/2017
 
 I worked on the understand language code so that it understands sentences without main verbs such as "No, I don't" and sentences without any verbs, such as "Yes". In this case, I use the verbs and objects of the asked question. This does not work for actions yet. I also realised it would be handy to have a built-in function to ask the robot to repeat the question. I also finished the basis of the program, but there are still some bugs that I found that I need to fix: an empty action answer does not work and 'yes' is not recognised as an answer.
+
+## Thursday 08/06/2017
+
+To Do:
+- Test all question templates: is it possible to give empty answers? is it possible to give non-empty answers?
