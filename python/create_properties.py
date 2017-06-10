@@ -61,8 +61,8 @@ def get_properties(item, database):
     """ Returns the properties of a drink. """
 
     drink = database.get(item)
-    return drink[0], drink[2], drink[3], drink[4], drink[5], drink[6], \
-        drink[7], drink[8], drink[9], drink[10]
+    return drink[0], drink[1], drink[2], drink[3], drink[4], drink[5], \
+        drink[6], drink[7], drink[8], drink[9]
 
 
 def only_ingredients(ingredients):

@@ -53,9 +53,8 @@ def get_info(drink):
     Retrieves the requested properties of a drink and returns them in a list.
     """
 
-    properties = ["name", "descriptionPlain", "color", "skill", "isAlcoholic",
-                  "isCarbonated", "isHot", "ingredients", "tastes", "tools",
-                  "actions"]
+    properties = ["name", "color", "skill", "isAlcoholic", "isCarbonated",
+                  "isHot", "ingredients", "tastes", "tools", "actions"]
     info = []
 
     for drink_property in properties:
