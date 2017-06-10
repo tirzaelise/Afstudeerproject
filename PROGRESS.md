@@ -265,5 +265,4 @@ I worked on the understand language code so that it understands sentences withou
 
 ## Thursday 08/06/2017
 
-To Do:
-- Test all question templates: is it possible to give empty answers? is it possible to give non-empty answers?
+I deleted the property 'occasions' from the list of drink properties, because it was not as good a property as the other ones. I also checked if it was possible to give 'empty' answers for all of the properties and it is. I tested the code on the Pepper for the first time and a lot of the code had to be changed slightly, e.g. LeftBackHandTouched was in a different position on the ALTouch status list (12 instead of 15). The most difficult thing was that I was searching for the folder in which the audio recording was saved without using a password by adding my public rsa key to the Nao's authorised keys. You need to be root in order to do this, but the superuser option has been removed from the Pepper so I could not do this. I ended up fixing this using pexpect, which waits for the password request and then automatically types it in.  
