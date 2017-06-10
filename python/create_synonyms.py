@@ -145,7 +145,7 @@ def update_dictionary(dictionary, key, value, properties):
                 for smaller_element in element:
                     dictionary.update({smaller_element: smaller_element})
                     get_synonyms(dictionary, key, smaller_element,
-                                      properties)
+                                 properties)
             else:
                 dictionary.update({element: element})
                 get_synonyms(dictionary, key, element, properties)

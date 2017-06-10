@@ -33,7 +33,6 @@ class Understand(object):
         drink properties and by setting up the robot.
         """
 
-        start_time = time.time()
         self.load_database()
         self.load_parser()
         self.load_synonyms(self.ordered_drinks)
@@ -164,9 +163,9 @@ class Understand(object):
 
         for verb in verbs:
             for parsed_element in parsed_sentence:
-                if not verb[0] in parsed_element[0] or not \
-                   "VB" in parsed_element[0]:
-                   verbs.remove(verb)
+                if verb[0] in parsed_element[0] and \
+                   "VB" not in parsed_element[0]:
+                       verbs.remove(verb)
         return verbs
 
 
@@ -177,8 +176,9 @@ class Understand(object):
         and objects should be used.
         """
 
-        if len(sentence) == 0 or (any("do" in verb for verb in verbs) \
-            and not any("dobj" in element for element in sentence)):
+        if len(sentence) == 0 or (any("do" in verb for verb in verbs) and not
+                                  any("dobj" in element for element in
+                                  sentence)):
             return True
         return False
 
@@ -421,16 +421,18 @@ class Understand(object):
         iterate_properties = iter(drink_properties)
         # Skip the first loop because it's the drink's name.
         next(iterate_properties)
+        # teamviewer
 
-        drink_property_index =  self.properties.index(drink_properties)
+        drink_property_index = self.properties.index(drink_properties)
 
         for element in iterate_properties:
             if word in element:
                 if negation:
                     drink = drink_properties[0].split(": ")[0]
-                    self.available_drinks.remove(drink)
-                    del self.properties[drink_property_index]
-                    self.load_synonyms(self.available_drinks)
+                    if drink in self.available_drinks:
+                        self.available_drinks.remove(drink)
+                        del self.properties[drink_property_index]
+                        self.load_synonyms(self.available_drinks)
                 else:
                     property_index = drink_properties.index(element)
                     element = element.replace("None", "True")
@@ -464,5 +466,5 @@ class Understand(object):
 
 
 if __name__ == "__main__":
-    understand = Understand(["margarita", "martini", "bloody mary"])
-    understand.understand_sentence("Do you have lemon juice?", "yes")
+    understand = Understand(["bloody mary"])
+    understand.understand_sentence("Do you have a mixing glass?", "no")

@@ -95,7 +95,7 @@ class Generate(object):
         property and its type.
         """
 
-        valid_templates = [s for s in self.templates if "{" + property_type + \
+        valid_templates = [s for s in self.templates if "{" + property_type +
                            "}" in s]
         return choice(valid_templates)
 
@@ -122,7 +122,6 @@ class Generate(object):
         if letter in ("a", "e", "i", "o", "u", "A", "E", "I", "O", "U"):
             return True
         return False
-
 
 
 def load_properties(ordered_drinks):
