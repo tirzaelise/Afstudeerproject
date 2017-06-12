@@ -63,10 +63,10 @@ def make_synonyms(database, properties):
         update_dictionary(synonyms, "tool", tools, properties)
         update_dictionary(synonyms, "action", actions, properties)
 
-        synonyms.update({"color": color})
-        synonyms.update({"alcoholic": alcoholic})
-        synonyms.update({"carbonated": carbonated})
-        synonyms.update({"temperature": hot})
+        synonyms.update({color: color})
+        synonyms.update({alcoholic: alcoholic})
+        synonyms.update({carbonated: carbonated})
+        synonyms.update({hot: hot})
 
         synonyms_dict.update({name: synonyms})
     return synonyms_dict
