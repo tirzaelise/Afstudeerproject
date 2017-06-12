@@ -164,8 +164,9 @@ class Understand(object):
         for verb in verbs:
             for parsed_element in parsed_sentence:
                 if verb[0] in parsed_element[0] and \
-                   "VB" not in parsed_element[0]:
+                   not any("VB" in string for string in parsed_element[0]):
                        verbs.remove(verb)
+                       break
         return verbs
 
 
@@ -407,8 +408,16 @@ class Understand(object):
                 if self.substring_in_list(found_key, drink_properties):
                     self.update_availability(drink_properties, found_key,
                                              negation)
-                    return True, self.properties
-        return False, self.properties
+                    self.all_true()
+                    return True
+        return False
+
+
+
+    def all_true(self):
+        for i in range(0, len(self.properties)):
+            if "None" in self.properties[i]:
+                self.properties[i] = self.properties[i].replace("None", "True")
 
 
     def update_availability(self, drink_properties, word, negation):
@@ -467,4 +476,4 @@ class Understand(object):
 
 if __name__ == "__main__":
     understand = Understand(["bloody mary"])
-    understand.understand_sentence("Do you have a mixing glass?", "no")
+    understand.understand_sentence("Is your skill-level easy?", "yes")
