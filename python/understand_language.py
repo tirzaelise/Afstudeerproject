@@ -113,6 +113,8 @@ class Understand(object):
         else:
             v, o, n = self.analyse_sentence(answer_verbs, parsed_answer, False,
                                             "")
+
+        pprint(parsed_question)
         return self.apply_sentence(v, o, n)
 
 
@@ -254,9 +256,13 @@ class Understand(object):
                 else:
                     function_words.append(word[2][0])
                     conjunctions = self.get_conjunctions(sentence, word[2][0])
+                    compound = self.get_compound(sentence, word[2][0])
                     if conjunctions:
                         function_words.append(conjunctions)
                         function_words = list(self.flatten(function_words))
+                    if compound:
+                        function_words.remove(word[2][0])
+                        function_words.append(compound)
         if not function_words:
             function_words.append(None)
         return function_words
@@ -274,6 +280,18 @@ class Understand(object):
             if word[1] == "conj" and word[0][0] == function_word:
                 conjunctions.append(word[2][0])
         return conjunctions
+
+
+    def get_compound(self, sentence, function_word):
+        """ Returns the compound of a word. """
+
+        compound = ""
+
+        for word in sentence:
+            if (word[1] == "compound" and word[0][0] == function_word) or \
+                (word[1]) == "amod" and word[0][0] == function_word:
+                compound = word[2][0] + " " + function_word
+        return compound
 
 
     def flatten(self, unflattened_list):
@@ -387,7 +405,7 @@ class Understand(object):
                 # drink_property = self.find_drink_property(word, pos)
                 updated_drinks = self.update_drinks(word, negations[i][j])
 
-        print self.available_drinks
+        # print self.available_drinks
         return updated_drinks
 
 
@@ -408,45 +426,21 @@ class Understand(object):
                 if self.substring_in_list(found_key, drink_properties):
                     self.update_availability(drink_properties, found_key,
                                              negation)
-                    self.all_true()
+                    # self.all_true()
                     return True
+        else:
+            split_word = word.split(" ")
+            for split_element in split_word:
+                found_key = self.synonyms.get(split_element)
+                if found_key:
+                    for drink_properties in self.properties:
+                        if self.substring_in_list(found_key, drink_properties):
+                            self.update_availability(drink_properties,
+                                                     found_key, negation)
+                            # self.all_true()
+                            return True
         return False
 
-
-
-    def all_true(self):
-        for i in range(0, len(self.properties)):
-            if "None" in self.properties[i]:
-                self.properties[i] = self.properties[i].replace("None", "True")
-
-
-    def update_availability(self, drink_properties, word, negation):
-        """
-        Updates the availability of a property value to False or True and
-        removes the drink from the list of available drinks if the property
-        value is False.
-        """
-
-        iterate_properties = iter(drink_properties)
-        # Skip the first loop because it's the drink's name.
-        next(iterate_properties)
-        # teamviewer
-
-        drink_property_index = self.properties.index(drink_properties)
-
-        for element in iterate_properties:
-            if word in element:
-                if negation:
-                    drink = drink_properties[0].split(": ")[0]
-                    if drink in self.available_drinks:
-                        self.available_drinks.remove(drink)
-                        del self.properties[drink_property_index]
-                        self.load_synonyms(self.available_drinks)
-                else:
-                    property_index = drink_properties.index(element)
-                    element = element.replace("None", "True")
-                    drink_properties[property_index] = element
-                    self.properties[drink_property_index] = drink_properties
 
 
     def substring_in_list(self, substring, l_ist):
@@ -462,6 +456,41 @@ class Understand(object):
         return False
 
 
+    # def all_true(self):
+    #     for i in range(0, len(self.properties)):
+    #         for j in range(0, len(self.properties[i])):
+    #             if "None" in self.properties[i][j]:
+                    # self.properties[i][j] = self.properties[i][j].replace("None", "True")
+
+
+    def update_availability(self, drink_properties, word, negation):
+        """
+        Updates the availability of a property value to False or True and
+        removes the drink from the list of available drinks if the property
+        value is False.
+        """
+
+        iterate_properties = iter(drink_properties)
+        # Skip the first loop because it's the drink's name.
+        next(iterate_properties)
+
+        drink_index = self.properties.index(drink_properties)
+
+        for element in iterate_properties:
+            if word in element:
+                if negation:
+                    drink = drink_properties[0].split(": ")[0]
+                    if drink in self.available_drinks:
+                        self.available_drinks.remove(drink)
+                        del self.properties[drink_index]
+                        self.load_synonyms(self.available_drinks)
+                else:
+                    property_index = drink_properties.index(element)
+                    element = element.replace("None", "True")
+                    drink_properties[property_index] = element
+                    self.properties[drink_index] = drink_properties
+
+
     def get_properties(self):
         """ Returns the list of properties. """
 
@@ -475,5 +504,5 @@ class Understand(object):
 
 
 if __name__ == "__main__":
-    understand = Understand(["bloody mary"])
-    understand.understand_sentence("Is your skill-level easy?", "yes")
+    understand = Understand(["bloody mary", "martini", "margarita", "cosmopolitan"])
+    print understand.understand_sentence("Do you have any fresh drinks?", "yes")
