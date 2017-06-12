@@ -37,14 +37,13 @@ def create_drink_dict(database):
     for item in database:
         drink_properties = []
 
-        name, color, skill_level, alcoholic, carbonated, hot, ingredients, \
+        name, color, alcoholic, carbonated, hot, ingredients, \
             tastes, tools, actions = get_properties(item, database)
         ingredients = only_ingredients(ingredients)
         tastes, tools, actions = split_lists(tastes, tools, actions)
 
         drink_properties.append(name + ": None // name")
         drink_properties.append(color + ": None // color")
-        drink_properties.append(skill_level + ": None // skill_level")
         drink_properties.append(alcoholic + ": None // alcoholic")
         drink_properties.append(carbonated + ": None // carbonated")
         drink_properties.append(hot + ": None // hot")
@@ -62,7 +61,7 @@ def get_properties(item, database):
 
     drink = database.get(item)
     return drink[0], drink[1], drink[2], drink[3], drink[4], drink[5], \
-        drink[6], drink[7], drink[8], drink[9]
+        drink[6], drink[7], drink[8]
 
 
 def only_ingredients(ingredients):
@@ -132,6 +131,7 @@ def save_properties(properties, output_file):
     """ Saves the properties in a Pickle file. """
 
     pickle.dump(properties, open(output_file, "wb"))
+
 
 if __name__ == "__main__":
     generate_property_dict()

@@ -1,5 +1,4 @@
 Do you have any {color} drinks?
-Is your skill level {skill_level}?
 Do you have any {alcoholic} drinks?
 Do you have any {carbonated} drinks?
 Do you have any {hot} drinks?

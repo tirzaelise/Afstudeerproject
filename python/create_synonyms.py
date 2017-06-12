@@ -36,26 +36,24 @@ def load_properties():
     of the property as a value.
     """
 
-    return {"color": wn.NOUN, "skill": wn.NOUN, "alcoholic": wn.ADJ,
-            "carbonation": wn.ADJ,  "temperature": wn.ADJ,
-            "ingredient": wn.NOUN, "taste": wn.NOUN, "tool": wn.NOUN,
-            "action": wn.VERB}
+    return {"color": wn.NOUN, "alcoholic": wn.ADJ, "carbonation": wn.ADJ,
+            "temperature": wn.ADJ, "ingredient": wn.NOUN, "taste": wn.NOUN,
+            "tool": wn.NOUN, "action": wn.VERB}
 
 
 def make_synonyms(database, properties):
     """
     Creates a dictionary of key words using the drinks database using the name,
-    colour, required skill level, whether it's alcoholic, whether it's
-    carbonated, whether it's hot, ingredients, tastes, tools and actions of the
-    drink.
+    colour, whether it's alcoholic, whether it's carbonated, whether it's hot,
+    ingredients, tastes, and tools of the drink.
     """
 
     synonyms_dict = {}
 
     for item in database:
         synonyms = {}
-        name, color, skill_level, alcoholic, carbonated, hot, ingredients, \
-            tastes, tools, actions = get_properties(item, database)
+        name, color, alcoholic, carbonated, hot, ingredients, tastes, tools, \
+            actions = get_properties(item, database)
 
         ingredients = only_ingredients(ingredients)
         tastes, tools, actions = split_lists(tastes, tools, actions)
@@ -66,7 +64,6 @@ def make_synonyms(database, properties):
         update_dictionary(synonyms, "action", actions, properties)
 
         synonyms.update({"color": color})
-        synonyms.update({"skill": skill_level})
         synonyms.update({"alcoholic": alcoholic})
         synonyms.update({"carbonated": carbonated})
         synonyms.update({"temperature": hot})
@@ -80,7 +77,7 @@ def get_properties(item, database):
 
     drink = database.get(item)
     return drink[0], drink[1], drink[2], drink[3], drink[4], drink[5], \
-        drink[6], drink[7], drink[8], drink[9]
+        drink[6], drink[7], drink[8]
 
 
 def only_ingredients(ingredients):
