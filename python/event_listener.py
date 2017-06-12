@@ -19,7 +19,9 @@ from naoqi import ALBroker, ALProxy, ALModule
 
 
 class TouchDetectorModule(ALModule):
-    """ This class detects whether the Nao's left hand is touched. """
+    """
+    This class detects whether the back of the robot's left hand is touched.
+    """
 
     def __init__(self, name, ip, ats, recording_file, understand, generate,
                  question):
@@ -39,6 +41,7 @@ class TouchDetectorModule(ALModule):
         self.understand = understand
         self.generate = generate
         self.question = question
+        self.finished = False
 
 
     def load_templates(self):
@@ -50,13 +53,13 @@ class TouchDetectorModule(ALModule):
 
         if os.path.exists("reply_templates.txt"):
             for line in open("reply_templates.txt", "r"):
-                key, value = line.split(": ")
+                key, reply = line.split(": ")
                 if key not in self.templates:
-                    self.templates.update({key: [value]})
+                    self.templates.update({key: [reply]})
                 else:
-                    existent_value = self.templates.get(key)
-                    existent_value.append(value)
-                    self.templates.update({key: existent_value})
+                    reply_list = self.templates.get(key)
+                    reply_list.append(reply)
+                    self.templates.update({key: reply_list})
 
 
     def onTouched(self, *_args):
@@ -79,6 +82,8 @@ class TouchDetectorModule(ALModule):
         # which case the value is False. This is done to prevent the microphones
         # from starting to record again when the user stops touching the robot's
         # hand.
+
+        print self.question
 
         # if self.alt.getStatus()[15][1] is True: # Nao
         if self.alt.getStatus()[12][1] is True:
@@ -107,7 +112,6 @@ class TouchDetectorModule(ALModule):
     def record_audio(self):
         """ Uses the Nao's microphones to record audio. """
 
-        print "start recording"
         self.aar.startMicrophonesRecording(self.recording_file, "wav",
                                            16000, (0, 0, 1, 0))
 
@@ -116,7 +120,6 @@ class TouchDetectorModule(ALModule):
             self.als.rotateEyes(0x001E90FF, 0.35, 0.01)
 
         self.aar.stopMicrophonesRecording()
-        print "stop recording"
 
 
     def handle_answer(self, answer):
@@ -162,7 +165,11 @@ class TouchDetectorModule(ALModule):
         available_drinks = self.understand.get_available_drinks()
         finished = self.get_finished_string(available_drinks)
         self.ats.say(str(finished))
+        self.finished = True
 
+
+    def is_finished(self):
+        return self.finished
 
     def get_finished_string(self, available_drinks):
         """ Constructs the string that indicates the end of the program. """
@@ -170,17 +177,17 @@ class TouchDetectorModule(ALModule):
         start = "I think I have all the information I need. "
 
         if len(available_drinks) == 0:
-            print "no available drinks"
-            end = "There are no available drinks."
+            end = "None of the ordered drinks are available."
         else:
-            print "drinks available"
             available_string = ", ".join(available_drinks)
-            end = "The available drinks are " + available_string
+            k = available_string.rfind(",")
+            new_string = available_string[:k] + " and " + available_string[k+1:]
+            end = "The available drinks are " + new_string
         return start + end
 
 
 if __name__ == "__main__":
-    ordered_drinks = ["bloody mary"]
+    ordered_drinks = ["bloody mary", "martini", "margarita", "cosmopolitan"]
     understand = Understand(ordered_drinks)
     properties = understand.get_properties()
     generate = Generate()
@@ -188,8 +195,8 @@ if __name__ == "__main__":
 
     global TouchDetector
     ip = "pepper.local"
-    ats = ALProxy("ALTextToSpeech", ip, 9559)
-    ats.setParameter("speed", 92)
+    ats = ALProxy("ALAnimatedSpeech", ip, 9559)
+    # ats.setParameter("speed", 95)
     ats.say(str(question))
 
     ownBroker = ALBroker("ownBroker", "0.0.0.0", 0, ip, 9559)
@@ -197,10 +204,13 @@ if __name__ == "__main__":
                                         "recording.wav", understand, generate,
                                         question)
 
-    while True:
+    while not TouchDetector.is_finished():
         try:
             time.sleep(1)
         except KeyboardInterrupt:
                 print "\nInterrupted by user, shutting down"
-                ownBroker.shutdown()
-                sys.exit(0)
+                break
+                # ownBroker.shutdown()
+                # sys.exit(0)
+    ownBroker.shutdown()
+    sys.exit(0)
