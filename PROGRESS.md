@@ -266,3 +266,11 @@ I worked on the understand language code so that it understands sentences withou
 ## Thursday 08/06/2017
 
 I deleted the property 'occasions' from the list of drink properties, because it was not as good a property as the other ones. I also checked if it was possible to give 'empty' answers for all of the properties and it is. I tested the code on the Pepper for the first time and a lot of the code had to be changed slightly, e.g. LeftBackHandTouched was in a different position on the ALTouch status list (12 instead of 15). The most difficult thing was that I was searching for the folder in which the audio recording was saved without using a password by adding my public rsa key to the Nao's authorised keys. You need to be root in order to do this, but the superuser option has been removed from the Pepper so I could not do this. I ended up fixing this using pexpect, which waits for the password request and then automatically types it in.  
+
+## Monday 12/06/2017
+
+I noticed that sometimes the wrong verbs get removed from the list of verbs, because there was no exact match found. I was able to fix this using any() and I noticed some mistakes in the list of synonyms that were there due to changes I had made in the code so I fixed those so that {color: green} is now saved under {green: green} instead as it should. I also changed the event_listener code so that it runs the program until it is finished, instead of having to do ctrl+c to end it. I also noticed that 'compound' and 'amod' are essential parsed elements for the object so I now append these to the object string before returning it. I also spent some time writing my thesis.
+
+## Tuesday 13/06/2017
+
+I noticed that, since the list of synonyms is a dictionary, sometimes a key wrongly gets overwritten, such as {stir: shake}. It is desirable to have such a word link to its original state, such that {stir: stir}.  I fixed this by checking if there is already an occurrence of {word: word}, before appending {synonym: word} so that it now links correctly when retrieving a key. I also focused a lot of my time today writing my thesis.
