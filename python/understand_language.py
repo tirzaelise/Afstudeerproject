@@ -69,7 +69,11 @@ class Understand(object):
             all_synonyms = pickle.load(open("drinks_synonyms.pkl", "rb"))
 
         for drink in drinks:
-            self.synonyms.update(all_synonyms.get(drink))
+            drink_synonyms = all_synonyms.get(drink)
+            for synonym, word in drink_synonyms.iteritems():
+                if not word in self.synonyms and not word == \
+                    self.synonyms.get(word):
+                    self.synonyms.update({synonym: word})
 
 
     def load_pos_tags(self):
@@ -114,7 +118,7 @@ class Understand(object):
             v, o, n = self.analyse_sentence(answer_verbs, parsed_answer, False,
                                             "")
 
-        pprint(parsed_question)
+        # pprint(parsed_question)
         return self.apply_sentence(v, o, n)
 
 
@@ -179,9 +183,11 @@ class Understand(object):
         and objects should be used.
         """
 
-        if len(sentence) == 0 or (any("do" in verb for verb in verbs) and not
+        if len(sentence) == 0 or ((any("do" in verb for verb in verbs) and not
                                   any("dobj" in element for element in
-                                  sentence)):
+                                  sentence)) or (any("can") in verb for verb in
+                                  verbs and not any("dobj") in element for
+                                  element in sentence)) or len(verbs) == 0:
             return True
         return False
 
@@ -314,6 +320,7 @@ class Understand(object):
         """
 
         sentences = [verbs, objects, negations]
+        # print sentences
         maximum_length = self.maximum_list_length(sentences)
 
         for i in range(0, len(sentences)):
@@ -416,6 +423,8 @@ class Understand(object):
         words.
         """
 
+        understood = False
+
         if wn.morphy(word):
             word = wn.morphy(word)
 
@@ -427,7 +436,7 @@ class Understand(object):
                     self.update_availability(drink_properties, found_key,
                                              negation)
                     # self.all_true()
-                    return True
+                    understood = True
         else:
             split_word = word.split(" ")
             for split_element in split_word:
@@ -438,8 +447,8 @@ class Understand(object):
                             self.update_availability(drink_properties,
                                                      found_key, negation)
                             # self.all_true()
-                            return True
-        return False
+                            understood = True
+        return understood
 
 
 
@@ -505,4 +514,6 @@ class Understand(object):
 
 if __name__ == "__main__":
     understand = Understand(["bloody mary", "martini", "margarita", "cosmopolitan"])
-    print understand.understand_sentence("Do you have any fresh drinks?", "yes")
+    # pprint(understand.synonyms)
+    print understand.understand_sentence("Can you stir drinks?", "No.")
+    pprint(understand.get_properties())
