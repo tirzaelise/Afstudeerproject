@@ -273,4 +273,4 @@ I noticed that sometimes the wrong verbs get removed from the list of verbs, bec
 
 ## Tuesday 13/06/2017
 
-I noticed that, since the list of synonyms is a dictionary, sometimes a key wrongly gets overwritten, such as {stir: shake}. It is desirable to have such a word link to its original state, such that {stir: stir}.  I fixed this by checking if there is already an occurrence of {word: word}, before appending {synonym: word} so that it now links correctly when retrieving a key. I also focused a lot of my time today writing my thesis.
+I noticed that, since the list of synonyms is a dictionary, sometimes a key wrongly gets overwritten, such as {stir: shake}. It is desirable to have such a word link to its original state, such that {stir: stir}.  I fixed this by checking if there is already an occurrence of {word: word}, before appending {synonym: word} so that it now links correctly when retrieving a key. I also focused a lot of my time today on writing my thesis.
