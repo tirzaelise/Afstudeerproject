@@ -171,7 +171,10 @@ def get_synonyms(dict_to_update, key, word, properties):
         for synset in synsets:
             for lemma in synset.lemma_names():
                 lemma = lemma.replace("_", " ")
-                dict_to_update.update({lemma: word})
+                if lemma in dict_to_update and lemma == dict_to_update.get(lemma):
+                    ab = 4
+                else:
+                    dict_to_update.update({lemma: word})
 
 
 def save_synonyms(synonyms, output_file):
