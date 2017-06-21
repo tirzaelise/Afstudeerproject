@@ -2,6 +2,7 @@
 
 import os
 import pickle
+from pprint import pprint
 from random import randint, choice
 
 
@@ -136,6 +137,7 @@ def load_properties(ordered_drinks):
 
 
 if __name__ == "__main__":
-    properties = load_properties(["martini", "margarita", "bloody mary"])
+    properties = load_properties(["martini", "margarita", "sangria",
+                                  "cosmopolitan", "mojito"])
     generate = Generate()
     generate.generate_language(properties)

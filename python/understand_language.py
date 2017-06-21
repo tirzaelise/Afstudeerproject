@@ -71,8 +71,9 @@ class Understand(object):
         for drink in drinks:
             drink_synonyms = all_synonyms.get(drink)
             for synonym, word in drink_synonyms.iteritems():
-                if not word in self.synonyms and not word == \
-                    self.synonyms.get(word):
+                if word in self.synonyms and word == self.synonyms.get(word):
+                    ab = 4
+                else:
                     self.synonyms.update({synonym: word})
 
 
@@ -117,8 +118,6 @@ class Understand(object):
         else:
             v, o, n = self.analyse_sentence(answer_verbs, parsed_answer, False,
                                             "")
-
-        # pprint(parsed_question)
         return self.apply_sentence(v, o, n)
 
 
@@ -143,6 +142,11 @@ class Understand(object):
                 verbs.append([word[0]])
 
         verbs = self.check_verbs(verbs, parsed_sentence)
+
+        if not verbs and ("can" and "MD" in element for element in
+            tagged_sentence):
+            verbs.append(["can"])
+
         return verbs
 
 
@@ -169,8 +173,10 @@ class Understand(object):
 
         for verb in verbs:
             for parsed_element in parsed_sentence:
-                if verb[0] in parsed_element[0] and \
-                   not any("VB" in string for string in parsed_element[0]):
+                if (verb[0] in parsed_element[0] and not any("VB" in string for
+                    string in parsed_element[0])) or (verb[0] in
+                    parsed_element[2] and not any("VB" in string for string in
+                    parsed_element[2])):
                        verbs.remove(verb)
                        break
         return verbs
@@ -183,8 +189,8 @@ class Understand(object):
         and objects should be used.
         """
 
-        if len(sentence) == 0 or ((any("do" in verb for verb in verbs) and not
-                                  any("dobj" in element for element in
+        if len(sentence) == 0 or (((any("do" in verb for verb in verbs) and not
+                                  any("dobj") in element for element in
                                   sentence)) or (any("can") in verb for verb in
                                   verbs and not any("dobj") in element for
                                   element in sentence)) or len(verbs) == 0:
@@ -320,7 +326,6 @@ class Understand(object):
         """
 
         sentences = [verbs, objects, negations]
-        # print sentences
         maximum_length = self.maximum_list_length(sentences)
 
         for i in range(0, len(sentences)):
@@ -385,17 +390,6 @@ class Understand(object):
     #     return best_synset_1, best_synset_2, highest_similarity
 
 
-    def is_possessive(self, verb):
-        """
-        Returns a boolean that indicates whether a verb expresses possession.
-        """
-
-        possesive = ("has", "have", "possess", "own", "has got", "have got",
-                     "hold")
-
-        return any(verb in string for string in possesive)
-
-
     def apply_sentence(self, verbs, objects, negations):
         """
         Uses the verbs, objects and negations to update the list of drinks.
@@ -405,15 +399,24 @@ class Understand(object):
             for j in range(0, len(verbs[i])):
                 if self.is_possessive(verbs[i][j]):
                     word = objects[i][j]
-                    pos = "n"
+                    # pos = "n"
                 else:
                     word = verbs[i][j]
-                    pos = "v"
+                    # pos = "v"
                 # drink_property = self.find_drink_property(word, pos)
                 updated_drinks = self.update_drinks(word, negations[i][j])
-
-        # print self.available_drinks
         return updated_drinks
+
+
+    def is_possessive(self, verb):
+        """
+        Returns a boolean that indicates whether a verb expresses possession.
+        """
+
+        possesive = ("has", "have", "possess", "own", "has got", "have got",
+                     "hold")
+
+        return any(verb in string for string in possesive)
 
 
     def update_drinks(self, word, negation):
@@ -448,6 +451,8 @@ class Understand(object):
                                                      found_key, negation)
                             # self.all_true()
                             understood = True
+        if understood:
+            pprint(self.properties)
         return understood
 
 
@@ -513,7 +518,7 @@ class Understand(object):
 
 
 if __name__ == "__main__":
-    understand = Understand(["bloody mary", "martini", "margarita", "cosmopolitan"])
-    # pprint(understand.synonyms)
-    print understand.understand_sentence("Can you stir drinks?", "No.")
+    understand = Understand(["bloody mary", "martini", "margarita",
+                             "cosmopolitan", "sangria"])
+    print understand.understand_sentence("Can you shake drinks?", "Yes, I can.")
     pprint(understand.get_properties())

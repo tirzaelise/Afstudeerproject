@@ -6,6 +6,7 @@
 
 
 import os
+from pprint import pprint
 from random import choice
 from recognise_speech import recognise_speech
 import subprocess
@@ -187,7 +188,8 @@ class TouchDetectorModule(ALModule):
 
 
 if __name__ == "__main__":
-    ordered_drinks = ["bloody mary", "martini", "margarita", "cosmopolitan"]
+    ordered_drinks = ["sangria", "martini", "margarita", "cosmopolitan",
+                      "mojito"]
     understand = Understand(ordered_drinks)
     properties = understand.get_properties()
     generate = Generate()
@@ -196,7 +198,6 @@ if __name__ == "__main__":
     global TouchDetector
     ip = "pepper.local"
     ats = ALProxy("ALAnimatedSpeech", ip, 9559)
-    # ats.setParameter("speed", 95)
     ats.say(str(question))
 
     ownBroker = ALBroker("ownBroker", "0.0.0.0", 0, ip, 9559)
@@ -210,7 +211,5 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
                 print "\nInterrupted by user, shutting down"
                 break
-                # ownBroker.shutdown()
-                # sys.exit(0)
     ownBroker.shutdown()
     sys.exit(0)
