@@ -14,3 +14,9 @@
     - Correct drinks: yes
     - Additional responses would be nice, also repeated questioning is a bit unnatural, but unavoidable I suppose.
     - The gestures make the conversation feel more natural.
+4.  - Naturalness: 6
+    - Correct drinks: no
+        - Can you muddle drinks?
+        - no I can't -> set to True (false positive)
+    - A wider range of sentence would have made the conversation more natural, otherwise it can become a bit repetitive. Maybe       some kind of confirmation at the user's answer can be useful so that the user can confirm that the robot heard the             correct answer.
+    - The sentences had a natural structure, which made the conversation feel more natural and the fact that it was not just         the same sentences that were used.
