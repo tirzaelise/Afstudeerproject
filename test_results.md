@@ -24,8 +24,13 @@
     - The sentences had a natural structure, which made the conversation feel more natural and the fact that it was not just         the same sentences that were used.
       e.g. there was variation, but not enough<br /><br />
     
-5.  - Naturalness:
+5.  - Naturalness: 6
     - Correct drinks: no
         - Can you repeat the question? -> set to True
     - A different method to start listening would have made the conversation feel more natural, or maybe he could have raised         his hand after asking a question.
     - The movements, the variation in words and the fact that he indicates when he does not understand made the conversation         feel more natural. 
+
+6.  - Naturalness: 7
+    - Correct drinks: yes
+    - Naming all possible things you already have to avoid repitition would have made the conversation feel more natural and       it would have been nice if you could give more answers: maybe, possibly.
+    - The answers he gave were diverse and he did understand everything well and communicated well.
