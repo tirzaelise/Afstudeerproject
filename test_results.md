@@ -21,4 +21,10 @@
         - Can you muddle drinks?
         - no I can't -> set to True (false positive)
     - A wider range of sentence would have made the conversation more natural, otherwise it can become a bit repetitive. Maybe       some kind of confirmation at the user's answer can be useful so that the user can confirm that the robot heard the             correct answer.
-    - The sentences had a natural structure, which made the conversation feel more natural and the fact that it was not just         the same sentences that were used.<br /><br />
+    - The sentences had a natural structure, which made the conversation feel more natural and the fact that it was not just         the same sentences that were used.
+      e.g. there was variation, but not enough<br /><br />
+    
+5.  - Naturalness:
+    - Correct drinks: no
+    - A different method to start listening would have made the conversation feel more natural, or maybe he could have raised         his hand after asking a question.
+    - The movements and the variation in words made the conversation feel more natural. 
