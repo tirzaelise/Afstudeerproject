@@ -26,5 +26,6 @@
     
 5.  - Naturalness:
     - Correct drinks: no
+        - Can you repeat the question? -> set to True
     - A different method to start listening would have made the conversation feel more natural, or maybe he could have raised         his hand after asking a question.
     - The movements, the variation in words and the fact that he indicates when he does not understand made the conversation         feel more natural. 
