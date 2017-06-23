@@ -41,3 +41,12 @@
         - no sorry
     - More head motions (using face detection), more various answers would have the conversation more natural. Furthermore,         it takes long to process an answer and the experiment itself was lengthy.
     - The arm movements made the conversation feel more natural.
+
+8.  - Naturalness: 4
+    - Correct drinks: no
+        - Can you muddle drinks?
+        - no I can't
+    - The program took to long, it could be shortened by creating more eliminating questions. It would have been good to have       other questions besides 'Do you have' and eye contact.
+    - 'Can you repeat' was good.
+
+    
