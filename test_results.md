@@ -33,4 +33,11 @@
 6.  - Naturalness: 7
     - Correct drinks: yes
     - Naming all possible things you already have to avoid repitition would have made the conversation feel more natural and       it would have been nice if you could give more answers: maybe, possibly.
-    - The answers he gave were diverse and he did understand everything well and communicated well.
+    - The answers he gave were diverse and he did understand everything well and communicated well.<br /><br />
+
+7.  - Naturalness: 4
+    - Correct drinks: no
+        - Do you have any gin?
+        - no sorry
+    - More head motions (using face detection), more various answers would have the conversation more natural. Furthermore,         it takes long to process an answer and the experiment itself was lengthy.
+    - The arm movements made the conversation feel more natural.
