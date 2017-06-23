@@ -47,6 +47,16 @@
         - Can you muddle drinks?
         - no I can't -> set to True
     - The program took to long, it could be shortened by creating more eliminating questions. It would have been good to have       other questions besides 'Do you have' and eye contact.
-    - 'Can you repeat' was good.
+    - 'Can you repeat' was good.<br /><br />
 
+9.  - Naturalness: 8
+    - Correct drinks: no
+        - Can you muddle drinks?
+        - keto drinks -> set to True
+    - Lacking: Having to hold hands for every answer (but you can't change this, it should always reach its hand out).         Maybe Pepper could ask some questions in more rapid succession. 
+    - The way she asked the questions sounded very natural. She understood many answers correctly.
     
+10. - Naturalness: 7
+    - Correct drinks: no
+    - Lacking: variation in question formulation.
+    - The body movements, intonation.
