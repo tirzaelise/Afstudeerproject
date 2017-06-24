@@ -53,10 +53,12 @@
     - Correct drinks: no
         - Can you muddle drinks?
         - keto drinks -> set to True
-    - Lacking: Having to hold hands for every answer (but you can't change this, it should always reach its hand out).         Maybe Pepper could ask some questions in more rapid succession. 
-    - The way she asked the questions sounded very natural. She understood many answers correctly.
+    - Lacking: Having to hold hands for every answer (but you can't change this, it should always reach its hand out).             Maybe Pepper could ask some questions in more rapid succession. 
+    - The way she asked the questions sounded very natural. She understood many answers correctly.<br /><br />
     
 10. - Naturalness: 7
     - Correct drinks: no
-    - Lacking: variation in question formulation.
+        - Can you muddle drinks?
+        - no I can't -> set to True
+    - Lacking: variation in question formulation.
     - The body movements, intonation.
