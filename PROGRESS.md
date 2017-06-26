@@ -278,3 +278,19 @@ I noticed that, since the list of synonyms is a dictionary, sometimes a key wron
 ## Wednesday 14/06/2017, Thursday 15/06/2017, Monday 19/06/2017
 
 I've been focusing on writing my thesis.
+
+# Tuesday 20/06/2017
+
+I wrote some for my thesis and I tested my program with two different people.
+
+# Wednesday 21/06/2017
+
+I wrote again and tested my program with another person (now 3).
+
+# Thursday 22/06/2017
+
+I focused on writing my thesis and tested the program with one person (now 4).
+
+# Friday 23/06/2017
+
+I spent the majority of the day testing the program with various people so I have now tested it with 10 different people. I spent the rest of the day writing.
